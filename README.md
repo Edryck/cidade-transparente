@@ -62,18 +62,23 @@ Variáveis de ambiente (ou `backend/src/main/resources/application.yml`):
 | `DB_URL` | URL de conexão do PostgreSQL | `jdbc:postgresql://localhost:5432/cidade_transparente` |
 | `DB_USER` | Usuário do banco | `postgres` |
 | `DB_PASSWORD` | Senha do banco | `postgres` |
-| `JWT_SECRET` | Chave usada para assinar o token | (definir localmente, nunca commitar) |
+| `JWT_SECRET` | Chave usada para assinar o token (HS256, **mínimo 32 caracteres**; a aplicação não sobe sem ela) | (definir localmente, nunca commitar) |
 | `JWT_EXPIRATION` | Validade do token, em milissegundos | `86400000` (24h) |
 
 ## Usuários de demonstração
 
-Criados pela migration de seed (`V6__seed_dados_demo.sql`), disponível apenas em ambiente de desenvolvimento:
+Criados pela migration repeatable `db/dev/R__seed_dados_demo.sql`, carregada só no perfil `dev` (o padrão ao rodar localmente; em outro ambiente, defina `SPRING_PROFILES_ACTIVE`):
 
 | Perfil | Usuário | Senha |
 |---|---|---|
+| ADMIN_PLATAFORMA | plataforma@demo.gov.br | plataforma123 |
 | ADMIN | admin@demo.gov.br | admin123 |
 | OUVIDOR | ouvidor@demo.gov.br | ouvidor123 |
 | SERVIDOR | servidor@demo.gov.br | servidor123 |
+| CIDADAO | cidadao@demo.gov.br | cidadao123 |
+| OUVIDOR (outro município) | ouvidor@outra.gov.br | ouvidor123 |
+
+O seed cria dois municípios fictícios (Vila Serena e Campo Aurora) para demonstrar o isolamento: o ouvidor de um não enxerga as manifestações do outro.
 
 ## Estrutura do projeto
 

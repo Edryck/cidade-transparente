@@ -44,7 +44,7 @@ Meta do exame é 10 ou mais. Ficam 12 no núcleo e 2 de reserva que podem cair s
 | # | Entidade | Papel |
 |---|---|---|
 | 1 | `Municipio` | Tenant. Tudo pertence a um município |
-| 2 | `Perfil` | Papel de acesso (ADMIN, OUVIDOR, SERVIDOR, CIDADAO) |
+| 2 | `Perfil` | Papel de acesso (ADMIN_PLATAFORMA, ADMIN, OUVIDOR, SERVIDOR, CIDADAO) |
 | 3 | `Usuario` | Login, senha, município, perfil |
 | 4 | `Secretaria` | Órgão/departamento que responde manifestações |
 | 5 | `Cidadao` | Dados de quem manifesta (pode ser anônimo) |
@@ -58,7 +58,7 @@ Meta do exame é 10 ou mais. Ficam 12 no núcleo e 2 de reserva que podem cair s
 | 13 | `Notificacao` (reserva) | Aviso de prazo próximo do vencimento |
 | 14 | `Auditoria` (reserva) | Log de quem fez o quê |
 
-**Relacionamentos principais:** Município 1:N Usuário, Secretaria e Manifestação. Manifestação N:1 Cidadão, TipoManifestação e Secretaria. Manifestação 1:N Anexo, Trâmite e Resposta. Resposta 1:N Recurso. TipoManifestação 1:1 PrazoLegal.
+**Relacionamentos principais:** Município 1:N Usuário, Secretaria e Manifestação. Manifestação N:1 Cidadão, TipoManifestação e Secretaria. Manifestação 1:N Anexo, Trâmite e Resposta. Resposta 1:1 Recurso (instância única). Usuário SERVIDOR N:1 Secretaria. TipoManifestação 1:N PrazoLegal: uma regra federal (`municipio_id` nulo) e, opcionalmente, uma por município que a sobrescreve (art. 45 da LAI permite regulamentação local).
 
 ## 5. Regras de negócio (o que dá profundidade)
 
@@ -66,18 +66,33 @@ Meta do exame é 10 ou mais. Ficam 12 no núcleo e 2 de reserva que podem cair s
 
 `RECEBIDA` → `EM_ANALISE` → `ENCAMINHADA` → `RESPONDIDA` → `ENCERRADA`
 
-Desvios: `PRORROGADA` (uma vez só), `EM_RECURSO` (depois de respondida), `ARQUIVADA`. Cada transição grava um `Tramite`. Transição inválida devolve 409.
+Desvios: `EM_RECURSO` (depois de respondida, só LAI), `ARQUIVADA` (a partir de RECEBIDA ou EM_ANALISE). Cada transição grava um `Tramite`. Transição inválida devolve 409.
+
+| De | Ação (quem) | Para |
+|---|---|---|
+| RECEBIDA | análise (OUVIDOR) | EM_ANALISE |
+| EM_ANALISE | encaminhamento (OUVIDOR) | ENCAMINHADA |
+| ENCAMINHADA | reencaminhamento (OUVIDOR) | ENCAMINHADA |
+| RECEBIDA, EM_ANALISE | arquivamento (OUVIDOR) | ARQUIVADA |
+| ENCAMINHADA | resposta (SERVIDOR da secretaria) | RESPONDIDA |
+| RESPONDIDA | recurso (CIDADAO, só tipo com `permite_recurso`, dentro do prazo) | EM_RECURSO |
+| EM_RECURSO | julgamento deferido / indeferido (OUVIDOR) | ENCAMINHADA / ENCERRADA |
+| RESPONDIDA | encerramento (OUVIDOR) | ENCERRADA |
+
+**Prorrogação não é status**: é a flag `prorrogada` na manifestação (permitida em RECEBIDA, EM_ANALISE e ENCAMINHADA). Como status, ela apagaria a etapa em que a manifestação estava.
 
 **Prazos (da pesquisa de mercado):**
 - Ouvidoria (Lei 13.460/2017): 30 dias, prorrogável uma vez por mais 30
 - Pedido LAI (Lei 12.527/2011): 20 dias, prorrogável uma vez por mais 10
 - Os números ficam na tabela `PrazoLegal`, não no código, então mudar lei não exige deploy
 - Prorrogar exige justificativa e só pode acontecer uma vez
+- `data_limite` é calculada na abertura e gravada: mudar o PrazoLegal depois não altera manifestações já abertas
+- Recurso só existe para LAI (arts. 15 e 16 da Lei 12.527): 10 dias para interpor, 5 para julgar, julgado pelo OUVIDOR. A Lei 13.460 (ouvidoria) não prevê fase recursal
 
 **Outras regras:**
 - Protocolo gerado no formato `ANO-MUNICIPIO-SEQUENCIAL`
 - Isolamento por município: o `municipioId` vem do token e filtra toda consulta. Ouvidor de uma cidade nunca vê dados de outra
-- Manifestação anônima é permitida (denúncia), mas o cidadão anônimo não recebe notificação
+- Manifestação anônima só para tipos com `permite_anonimo` (denúncia); pedido LAI exige identificação. O cidadão anônimo não recebe notificação
 - Resposta só pode ser dada por servidor da secretaria para a qual a manifestação foi encaminhada
 
 ## 6. Segurança (JWT)
@@ -89,7 +104,8 @@ Desvios: `PRORROGADA` (uma vez só), `EM_RECURSO` (depois de respondida), `ARQUI
 
 | Perfil | Pode |
 |---|---|
-| ADMIN | Gerenciar município, secretarias, usuários e prazos |
+| ADMIN_PLATAFORMA | Cadastrar e editar municípios e criar o primeiro ADMIN de cada um. Não tem município e não acessa dados de nenhum |
+| ADMIN | Gerenciar o próprio município, secretarias, usuários e prazos |
 | OUVIDOR | Ver todas as manifestações do município, encaminhar, prorrogar, arquivar, gerar relatório |
 | SERVIDOR | Ver e responder só as manifestações da própria secretaria |
 | CIDADAO | Registrar manifestação, acompanhar as próprias, abrir recurso |
@@ -107,7 +123,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Usuários | CRUD `/usuarios` |
 | Tipos e prazos | `GET /tipos-manifestacao`, `PUT /tipos-manifestacao/{id}/prazo` |
 | Manifestações | `POST /manifestacoes`, `GET /manifestacoes` (filtros + paginação), `GET /manifestacoes/{id}` |
-| Ações | `POST /manifestacoes/{id}/encaminhamento`, `/prorrogacao`, `/arquivamento` |
+| Ações | `POST /manifestacoes/{id}/analise`, `/encaminhamento`, `/prorrogacao`, `/arquivamento`, `/encerramento` |
 | Anexos | `POST/GET /manifestacoes/{id}/anexos` |
 | Trâmites | `GET /manifestacoes/{id}/tramites` |
 | Respostas | `POST /manifestacoes/{id}/respostas` |
@@ -131,7 +147,7 @@ V2__cria_secretaria_cidadao.sql
 V3__cria_tipo_prazo_manifestacao.sql
 V4__cria_anexo_tramite_resposta_recurso.sql
 V5__seed_perfis_tipos_e_prazos.sql
-V6__seed_dados_demo.sql        (só perfil dev)
+db/dev/R__seed_dados_demo.sql  (repeatable e idempotente, só no perfil dev)
 ```
 
 `spring.jpa.hibernate.ddl-auto=validate` para o Hibernate nunca mexer no schema, só o Flyway.

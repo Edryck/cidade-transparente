@@ -46,7 +46,8 @@ A documentação completa do domínio, entidades, regras de negócio e endpoints
 
 - Claims do JWT: `sub` (usuário), `roles`, `municipioId`.
 - Todo repository/query de dado município-específico filtra por `municipioId` vindo do token — nunca por parâmetro vindo do cliente. Isolamento entre municípios é regra de segurança, não só de negócio.
-- Autorização por perfil com `@PreAuthorize`, perfis: `ADMIN`, `OUVIDOR`, `SERVIDOR`, `CIDADAO`.
+- Autorização por perfil com `@PreAuthorize`, perfis: `ADMIN_PLATAFORMA`, `ADMIN`, `OUVIDOR`, `SERVIDOR`, `CIDADAO`.
+- `ADMIN_PLATAFORMA` não tem município: só acessa `/municipios` e cria o primeiro ADMIN de cada município. Nenhuma rota com dados de município o inclui no `@PreAuthorize`, e ler `municipioId` de um token sem esse claim lança exceção (o filtro falha fechado, nunca vira "sem filtro").
 
 ## Testes
 
