@@ -1,0 +1,4 @@
+spring:
+  flyway:
+    # db/dev guarda o seed repeatable (R__) com dados de demonstração, só carregado neste perfil
+    locations: classpath:db/migration,classpath:db/dev
