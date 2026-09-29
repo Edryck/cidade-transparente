@@ -218,6 +218,10 @@
     {
       "key": "feriadoMunicipalId",
       "value": ""
+    },
+    {
+      "key": "anoRelatorio",
+      "value": ""
     }
   ],
   "item": [
@@ -8925,6 +8929,815 @@
                   }
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Relatório de gestão",
+      "item": [
+        {
+          "name": "Prévia do ano atual (OUVIDOR)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoAtual}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoAtual}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('anoAtual', String(new Date().getFullYear()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json(); const e = r.estatisticas;",
+                  "pm.test('RASCUNHO calculado na hora', () => pm.expect(r.situacao).to.eql('RASCUNHO'));",
+                  "pm.test('art. 15, I: manifestações recebidas', () => pm.expect(e.recebidas).to.be.at.least(8));",
+                  "pm.test('art. 15, II: motivos somam o total', () => pm.expect(e.porTipo.reduce((s, x) => s + x.total, 0)).to.eql(e.recebidas));",
+                  "pm.test('LAI art. 30, III: pedidos e recursos', () => { pm.expect(e.lai.pedidosRecebidos).to.be.at.least(2); pm.expect(e.lai.recursosInterpostos).to.be.at.least(1); });",
+                  "pm.test('percentual no prazo entre 0 e 100', () => pm.expect(e.prazos.percentualNoPrazo).to.be.within(0, 100));",
+                  "pm.test('nenhum dado pessoal', () => pm.expect(pm.response.text()).to.not.match(/@|cpf|Maria/i));",
+                  "const rels = Object.keys(pm.response.json()._links);",
+                  "pm.test('oferece rascunho', () => pm.expect(rels).to.include.members(['rascunho']));",
+                  "pm.test('não oferece publicacao, publico', () => ['publicacao', 'publico'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prévia pelo ADMIN (só leitura)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoAtual}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoAtual}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const rels = Object.keys(pm.response.json()._links);",
+                  "pm.test('não oferece rascunho, publicacao', () => ['rascunho', 'publicacao'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prévia pelo ouvidor de outro município: só os números dele",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoAtual}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoAtual}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidorOutro}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('Campo Aurora', () => pm.expect(pm.response.json().municipio).to.include('Campo Aurora'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prévia pelo SERVIDOR (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoAtual}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoAtual}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenServidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prévia pelo CIDADAO (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoAtual}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoAtual}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadao}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ano futuro (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/2999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "2999"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publicar o ano corrente (409: ano não terminou)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoAtual}}/publicacao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoAtual}}",
+                "publicacao"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                  "pm.test('cita o art. 15, I', () => pm.expect(pm.response.json().detail).to.include('art. 15, I'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ano encerrado sem parte escrita: sem link de publicação",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Publicação é permanente: usa o ano passado mais recente ainda em rascunho, para a coleção poder ser repetida",
+                  "const base = pm.variables.replaceIn('{{baseUrl}}'); const token = pm.collectionVariables.get('tokenOuvidor');",
+                  "const buscar = ano => pm.sendRequest({url: base + '/api/v1/relatorios/gestao/' + ano, header: {Authorization: 'Bearer ' + token}}, (e, r) => {",
+                  "  if (!e && r.code === 200 && r.json().situacao === 'RASCUNHO') pm.collectionVariables.set('anoRelatorio', String(ano));",
+                  "  else if (ano > 2000) buscar(ano - 1);",
+                  "});",
+                  "buscar(new Date().getFullYear() - 1);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const rels = Object.keys(pm.response.json()._links);",
+                  "pm.test('oferece rascunho', () => pm.expect(rels).to.include.members(['rascunho']));",
+                  "pm.test('não oferece publicacao', () => ['publicacao'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publicar sem análise e providências (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}/publicacao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}",
+                "publicacao"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                  "pm.test('cita o art. 15, III e IV', () => pm.expect(pm.response.json().detail).to.include('III e IV'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rascunho pelo ADMIN (403: quem elabora é a ouvidoria)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"analisePontosRecorrentes\": \"Iluminação pública e pavimentação concentraram a maior parte das reclamações.\",\n  \"providenciasAdotadas\": \"Contrato de manutenção de iluminação revisado; cronograma de recapeamento publicado.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Salvar rascunho (OUVIDOR)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"analisePontosRecorrentes\": \"Iluminação pública e pavimentação concentraram a maior parte das reclamações.\",\n  \"providenciasAdotadas\": \"Contrato de manutenção de iluminação revisado; cronograma de recapeamento publicado.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const rels = Object.keys(pm.response.json()._links);",
+                  "pm.test('oferece rascunho, publicacao', () => pm.expect(rels).to.include.members(['rascunho', 'publicacao']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rascunho não é público (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/relatorios-gestao/{{anoRelatorio}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "relatorios-gestao",
+                "{{anoRelatorio}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publicar (200): números congelados",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}/publicacao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}",
+                "publicacao"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('PUBLICADO', () => pm.expect(pm.response.json().situacao).to.eql('PUBLICADO'));",
+                  "const rels = Object.keys(pm.response.json()._links);",
+                  "pm.test('oferece publico', () => pm.expect(rels).to.include.members(['publico']));",
+                  "pm.test('não oferece rascunho, publicacao', () => ['rascunho', 'publicacao'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alterar relatório publicado (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"analisePontosRecorrentes\": \"Iluminação pública e pavimentação concentraram a maior parte das reclamações.\",\n  \"providenciasAdotadas\": \"Contrato de manutenção de iluminação revisado; cronograma de recapeamento publicado.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publicar de novo (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/relatorios/gestao/{{anoRelatorio}}/publicacao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "relatorios",
+                "gestao",
+                "{{anoRelatorio}}",
+                "publicacao"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Relatório publicado na internet, sem login (art. 15, p. ú., II)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/relatorios-gestao/{{anoRelatorio}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "relatorios-gestao",
+                "{{anoRelatorio}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.test('completo: números e parte escrita', () => { pm.expect(r.estatisticas).to.be.an('object'); pm.expect(r.analisePontosRecorrentes).to.be.a('string'); pm.expect(r.providenciasAdotadas).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lista pública de relatórios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/relatorios-gestao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "relatorios-gestao"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('inclui o ano publicado', () => pm.expect(pm.response.json()._embedded.relatorios.map(r => String(r.ano))).to.include(pm.collectionVariables.get('anoRelatorio')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Relatórios de município inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/999999/relatorios-gestao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "999999",
+                "relatorios-gestao"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
             }
           ]
         }
