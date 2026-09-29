@@ -25,6 +25,17 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+  servlet:
+    multipart:
+      # Anexos: mesmo limite do CHECK no banco (5 MB); acima disso o Spring responde 413
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+
 jwt:
   # Sem default de propósito: a aplicação não sobe sem JWT_SECRET definido
   secret: ${JWT_SECRET}

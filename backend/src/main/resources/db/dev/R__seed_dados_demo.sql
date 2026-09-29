@@ -54,13 +54,16 @@ ON CONFLICT (usuario_id) DO NOTHING;
 
 -- Uma manifestação em cada estado interessante para o HATEOAS, mais uma no outro município
 -- (para demonstrar o isolamento). Datas relativas a now() para os prazos fazerem sentido na demo.
+-- Chave de acesso de demonstração: 'DEMO-' + sequencial (ex.: DEMO-000004). Em produção a chave é aleatória.
 INSERT INTO manifestacao (municipio_id, protocolo, tipo_manifestacao_id, cidadao_id, secretaria_id,
-                          assunto, descricao, status, data_abertura, data_limite, prorrogada, data_encerramento)
+                          assunto, descricao, status, data_abertura, data_limite, prorrogada, data_encerramento,
+                          chave_acesso_hash)
 SELECT m.id, d.protocolo, t.id, c.id, s.id, d.assunto, d.descricao, d.status,
        now() - make_interval(days => d.dias_atras),
        (now() - make_interval(days => d.dias_atras))::date + d.dias_prazo,
        d.prorrogada,
-       CASE WHEN d.status = 'ENCERRADA' THEN now() - interval '1 day' END
+       CASE WHEN d.status = 'ENCERRADA' THEN now() - interval '1 day' END,
+       encode(sha256(convert_to('DEMO-' || right(d.protocolo, 6), 'UTF8')), 'hex')
   FROM (VALUES
         ('9999901', '2026-9999901-000001', 'RECLAMACAO',        TRUE,  NULL,    'Buraco na Rua das Palmeiras',     'Buraco grande em frente ao número 120, risco para motociclistas.', 'RECEBIDA',    2,  30, FALSE),
         ('9999901', '2026-9999901-000002', 'DENUNCIA',          FALSE, NULL,    'Descarte irregular de entulho',   'Caçambas despejando entulho no terreno baldio da Av. Central.',     'EM_ANALISE',  5,  30, FALSE),
@@ -74,6 +77,12 @@ SELECT m.id, d.protocolo, t.id, c.id, s.id, d.assunto, d.descricao, d.status,
   LEFT JOIN cidadao c ON d.identificada AND c.municipio_id = m.id
   LEFT JOIN secretaria s ON s.municipio_id = m.id AND s.sigla = d.sigla
 ON CONFLICT (protocolo) DO NOTHING;
+
+-- Bancos criados antes da V7 receberam chave aleatória nas manifestações de demo: volta para a conhecida
+UPDATE manifestacao
+   SET chave_acesso_hash = encode(sha256(convert_to('DEMO-' || right(protocolo, 6), 'UTF8')), 'hex')
+ WHERE protocolo LIKE '2026-999990_-%'
+   AND chave_acesso_hash <> encode(sha256(convert_to('DEMO-' || right(protocolo, 6), 'UTF8')), 'hex');
 
 INSERT INTO protocolo_sequencia (municipio_id, ano, ultimo)
 SELECT m.id, 2026, x.ultimo
@@ -108,13 +117,23 @@ SELECT ma.id, tr.anterior, tr.novo, u.id, s.id, tr.descricao, ma.data_abertura +
   LEFT JOIN secretaria s ON s.municipio_id = ma.municipio_id AND s.sigla = tr.sigla
  WHERE NOT EXISTS (SELECT 1 FROM tramite x WHERE x.manifestacao_id = ma.id);
 
-INSERT INTO resposta (manifestacao_id, usuario_id, secretaria_id, texto, respondida_em)
-SELECT ma.id, u.id, s.id, r.texto, ma.data_abertura + make_interval(days => r.dia)
+-- O pedido LAI 000004 foi atendido em parte (documento preparatório, LAI art. 7º, § 3º): cabe recurso,
+-- então a demo mostra o link "recurso" para o cidadão
+INSERT INTO resposta (manifestacao_id, usuario_id, secretaria_id, texto, resultado_lai, respondida_em)
+SELECT ma.id, u.id, s.id, r.texto, r.resultado, ma.data_abertura + make_interval(days => r.dia)
   FROM (VALUES
-        ('2026-9999901-000004', 'SEMOB', 'As obras do Jardim Sul começam em novembro, com conclusão prevista para março. Cronograma completo em anexo no portal da transparência.', 8),
-        ('2026-9999901-000005', 'SEMOB', 'Agradecemos o elogio, que foi repassado à equipe de pavimentação.', 10)
-       ) AS r (protocolo, sigla, texto, dia)
+        ('2026-9999901-000004', 'SEMOB', 'As obras do Jardim Sul começam em novembro, com conclusão prevista para março. O cronograma detalhado por rua ainda está em elaboração e será disponibilizado quando aprovado (Lei 12.527, art. 7º, § 3º).', 'PARCIALMENTE_CONCEDIDO', 8),
+        ('2026-9999901-000005', 'SEMOB', 'Agradecemos o elogio, que foi repassado à equipe de pavimentação.', NULL, 10)
+       ) AS r (protocolo, sigla, texto, resultado, dia)
   JOIN manifestacao ma ON ma.protocolo = r.protocolo
   JOIN secretaria s ON s.municipio_id = ma.municipio_id AND s.sigla = r.sigla
   JOIN usuario u ON u.email = 'servidor@demo.gov.br'
  WHERE NOT EXISTS (SELECT 1 FROM resposta x WHERE x.manifestacao_id = ma.id);
+
+-- Bancos que já tinham a resposta de demo antes da V7: registra o resultado LAI
+UPDATE resposta r
+   SET resultado_lai = 'PARCIALMENTE_CONCEDIDO'
+  FROM manifestacao ma
+ WHERE r.manifestacao_id = ma.id
+   AND ma.protocolo = '2026-9999901-000004'
+   AND r.resultado_lai IS NULL;

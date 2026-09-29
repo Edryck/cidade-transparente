@@ -1,6 +1,7 @@
 package br.edu.utfpr.cidadetransparente.exception;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -32,6 +33,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     ProblemDetail tratarIntegridade(DataIntegrityViolationException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Operação conflita com dados já existentes");
+    }
+
+    /** Ordenação por campo inexistente (?sort=xyz) é erro do cliente, não do servidor. */
+    @ExceptionHandler(PropertyReferenceException.class)
+    ProblemDetail tratarOrdenacaoInvalida(PropertyReferenceException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Campo de ordenação inválido: " + e.getPropertyName());
     }
 
     /** 400 com a lista de campos inválidos, para o frontend marcar cada campo. */

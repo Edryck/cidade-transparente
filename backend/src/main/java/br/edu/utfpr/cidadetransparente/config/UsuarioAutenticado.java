@@ -8,6 +8,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /** Dados do usuário extraídos do JWT. É o principal da autenticação: nenhuma consulta ao banco por requisição. */
 public record UsuarioAutenticado(Long id, String perfil, Long municipioId) {
 
+    /** Usuário do token, ou nulo em requisição sem token (rotas públicas, como a manifestação anônima). */
+    public static UsuarioAutenticado atualOuNulo() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getPrincipal() instanceof UsuarioAutenticado usuario ? usuario : null;
+    }
+
     public static UsuarioAutenticado atual() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof UsuarioAutenticado usuario)) {

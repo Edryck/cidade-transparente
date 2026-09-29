@@ -50,4 +50,7 @@ public class Manifestacao {
     private boolean prorrogada;
 
     private OffsetDateTime dataEncerramento;
+
+    /** SHA-256 da chave da consulta pública. A chave em si nunca é guardada. */
+    private String chaveAcessoHash;
 }
