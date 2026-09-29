@@ -11,7 +11,6 @@ import br.edu.utfpr.cidadetransparente.dto.RegistroCidadaoRequest;
 import br.edu.utfpr.cidadetransparente.exception.ApiException;
 import br.edu.utfpr.cidadetransparente.repository.CidadaoRepository;
 import br.edu.utfpr.cidadetransparente.repository.MunicipioRepository;
-import br.edu.utfpr.cidadetransparente.repository.PerfilRepository;
 import br.edu.utfpr.cidadetransparente.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,15 +18,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Locale;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
     private final MunicipioRepository municipioRepository;
-    private final PerfilRepository perfilRepository;
     private final CidadaoRepository cidadaoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -52,31 +49,19 @@ public class AuthService {
                 .filter(Municipio::isAtivo)
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Município inexistente ou desativado"));
 
-        String email = request.email().trim().toLowerCase(Locale.ROOT);
-        if (usuarioRepository.existsByEmailIgnoreCase(email)) {
-            throw ApiException.conflito("Já existe uma conta com este e-mail");
-        }
         String cpf = request.cpf() == null ? null : request.cpf().replaceAll("\\D", "");
         if (cpf != null && cidadaoRepository.existsByMunicipioIdAndCpf(municipio.getId(), cpf)) {
             throw ApiException.conflito("Já existe um cidadão com este CPF neste município");
         }
 
-        Perfil perfilCidadao = perfilRepository.findByNome(Perfil.CIDADAO)
-                .orElseThrow(() -> new IllegalStateException("Perfil CIDADAO ausente: migration V5 não aplicada"));
-
-        Usuario usuario = new Usuario();
-        usuario.setNome(request.nome().trim());
-        usuario.setEmail(email);
-        usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
-        usuario.setPerfil(perfilCidadao);
-        usuario.setMunicipio(municipio);
-        usuarioRepository.save(usuario);
+        Usuario usuario = usuarioService.criarConta(request.nome(), request.email(), request.senha(),
+                Perfil.CIDADAO, municipio, null);
 
         Cidadao cidadao = new Cidadao();
         cidadao.setMunicipio(municipio);
         cidadao.setUsuario(usuario);
         cidadao.setNome(usuario.getNome());
-        cidadao.setEmail(email);
+        cidadao.setEmail(usuario.getEmail());
         cidadao.setCpf(cpf);
         cidadao.setTelefone(request.telefone());
         cidadaoRepository.save(cidadao);
