@@ -118,6 +118,18 @@
     {
       "key": "tipoLaiId",
       "value": ""
+    },
+    {
+      "key": "municipioOutroId",
+      "value": ""
+    },
+    {
+      "key": "usuarioCidadaoNovoId",
+      "value": ""
+    },
+    {
+      "key": "emailCidadaoNovo",
+      "value": ""
     }
   ],
   "item": [
@@ -156,7 +168,8 @@
                   "pm.test('expõe só id, nome e uf', () => lista.forEach(m => pm.expect(m).to.have.all.keys('id','nome','uf')));",
                   "const demo = lista.find(m => m.nome === 'Vila Serena');",
                   "pm.test('contém o município de demo', () => pm.expect(demo).to.exist);",
-                  "pm.collectionVariables.set('municipioDemoId', demo.id);"
+                  "pm.collectionVariables.set('municipioDemoId', demo.id);",
+                  "pm.collectionVariables.set('municipioOutroId', lista.find(m => m.nome === 'Campo Aurora').id);"
                 ]
               }
             }
@@ -708,7 +721,8 @@
                   "const payload = JSON.parse(atob(corpo.token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('já sai autenticado como CIDADAO', () => pm.expect(payload.roles).to.eql(['CIDADAO']));",
                   "pm.test('no município escolhido', () => pm.expect(payload.municipioId).to.eql(Number(pm.collectionVariables.get('municipioDemoId'))));",
-                  "pm.collectionVariables.set('tokenCidadaoNovo', corpo.token);"
+                  "pm.collectionVariables.set('tokenCidadaoNovo', corpo.token);",
+                  "pm.collectionVariables.set('usuarioCidadaoNovoId', corpo.usuarioId);"
                 ]
               }
             }
@@ -967,7 +981,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Nova Esperança do Teste\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"{{ibgeNovo}}\",\n  \"admin\": {\n    \"nome\": \"Gestora Nova\",\n    \"email\": \"admin{{$timestamp}}@nova.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+              "raw": "{\n  \"nome\": \"Nova Esperança do Teste\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"{{ibgeNovo}}\",\n  \"admin\": {\n    \"nome\": \"Gestora Nova\",\n    \"email\": \"admin{{$timestamp}}@nova.gov.br\",\n    \"senha\": \"senhaforte123\"\n  },\n  \"encarregado\": {\n    \"nome\": \"Encarregado de Dados de Teste\",\n    \"email\": \"lgpd{{$timestamp}}@nova.gov.br\"\n  }\n}"
             }
           },
           "event": [
@@ -1080,7 +1094,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Clone\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"9999901\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"x{{$timestamp}}@x.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+              "raw": "{\n  \"nome\": \"Clone\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"9999901\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"x{{$timestamp}}@x.gov.br\",\n    \"senha\": \"senhaforte123\"\n  },\n  \"encarregado\": {\n    \"nome\": \"Encarregado de Dados de Teste\",\n    \"email\": \"lgpd{{$timestamp}}@nova.gov.br\"\n  }\n}"
             }
           },
           "event": [
@@ -1129,7 +1143,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Sem Admin\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"{{ibgeNovo}}\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"admin@demo.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+              "raw": "{\n  \"nome\": \"Sem Admin\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"{{ibgeNovo}}\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"admin@demo.gov.br\",\n    \"senha\": \"senhaforte123\"\n  },\n  \"encarregado\": {\n    \"nome\": \"Encarregado de Dados de Teste\",\n    \"email\": \"lgpd{{$timestamp}}@nova.gov.br\"\n  }\n}"
             }
           },
           "event": [
@@ -1188,7 +1202,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"\",\n  \"uf\": \"pr\",\n  \"codigoIbge\": \"123\",\n  \"admin\": {\n    \"nome\": \"\",\n    \"email\": \"ruim\",\n    \"senha\": \"curta\"\n  }\n}"
+              "raw": "{\n  \"nome\": \"\",\n  \"uf\": \"pr\",\n  \"codigoIbge\": \"123\",\n  \"admin\": {\n    \"nome\": \"\",\n    \"email\": \"ruim\",\n    \"senha\": \"curta\"\n  },\n  \"encarregado\": {\n    \"nome\": \"\",\n    \"email\": \"ruim\"\n  }\n}"
             }
           },
           "event": [
@@ -1199,7 +1213,57 @@
                 "exec": [
                   "pm.test('400', () => pm.response.to.have.status(400));",
                   "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
-                  "pm.test('valida também o admin aninhado', () => pm.expect(pm.response.json().campos).to.include.keys('nome','uf','codigoIbge','admin.email','admin.senha'));"
+                  "pm.test('valida admin e encarregado aninhados', () => pm.expect(pm.response.json().campos).to.include.keys('nome','uf','codigoIbge','admin.email','admin.senha','encarregado.nome','encarregado.email'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar município sem encarregado (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sem Encarregado\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"9700001\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"x{{$timestamp}}@x.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                  "pm.test('LGPD art. 41: encarregado obrigatório', () => pm.expect(pm.response.json().campos).to.have.property('encarregado'));"
                 ]
               }
             }
@@ -2174,7 +2238,8 @@
                   "pm.test('200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json()._embedded.usuarios;",
                   "pm.test('não expõe senha', () => lista.forEach(u => pm.expect(u).to.not.have.any.keys('senha','senhaHash')));",
-                  "pm.test('só usuários do próprio município', () => pm.expect(lista.map(u => u.email)).to.not.include('ouvidor@outra.gov.br'));"
+                  "pm.test('só usuários do próprio município', () => pm.expect(lista.map(u => u.email)).to.not.include('ouvidor@outra.gov.br'));",
+                  "pm.test('não lista contas de cidadãos (LGPD art. 6º, III)', () => lista.forEach(u => pm.expect(u.perfil).to.not.eql('CIDADAO')));"
                 ]
               }
             }
@@ -2798,7 +2863,7 @@
           ]
         },
         {
-          "name": "Alterar conta de cidadão (403)",
+          "name": "Alterar conta de cidadão (404, invisível para o ADMIN)",
           "request": {
             "method": "PUT",
             "header": [
@@ -2840,8 +2905,95 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('403', () => pm.response.to.have.status(403));",
-                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuários com perfil CIDADAO (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios?perfil=CIDADAO",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "perfil",
+                  "value": "CIDADAO"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar conta de cidadão (404, invisível para o ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{idCidadao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{idCidadao}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
                 ]
               }
             }
@@ -3686,6 +3838,901 @@
                 "exec": [
                   "pm.test('200', () => pm.response.to.have.status(200));",
                   "pm.test('FEDERAL de novo', () => pm.expect(pm.response.json().prazo.origem).to.eql('FEDERAL'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Privacidade (LGPD)",
+      "item": [
+        {
+          "name": "Aviso de privacidade (público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/privacidade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "privacidade"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const aviso = pm.response.json();",
+                  "pm.test('traz o encarregado (art. 41)', () => pm.expect(aviso.encarregado.email).to.eql('lgpd@demo.gov.br'));",
+                  "pm.test('todo tratamento tem base legal e retenção (arts. 9º e 23)', () => aviso.tratamentos.forEach(t => { pm.expect(t.baseLegal).to.not.be.empty; pm.expect(t.retencao).to.not.be.empty; }));",
+                  "pm.test('lista os direitos do art. 18', () => pm.expect(aviso.direitos.length).to.be.at.least(5));",
+                  "pm.test('tem versão', () => pm.expect(aviso.versao).to.match(/^\\d{4}-\\d{2}-\\d{2}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aviso de município inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/999999/privacidade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "999999",
+                "privacidade"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir encarregado (ADMIN, 204)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/encarregado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "encarregado"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Novo Encarregado\",\n  \"email\": \"Novo.Encarregado@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aviso reflete o novo encarregado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/privacidade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "privacidade"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('e-mail normalizado', () => pm.expect(pm.response.json().encarregado.email).to.eql('novo.encarregado@demo.gov.br'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restaurar encarregado do seed (204)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/encarregado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "encarregado"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Encarregada de Dados de Vila Serena\",\n  \"email\": \"lgpd@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir encarregado de outro município (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioOutroId}}/encarregado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioOutroId}}",
+                "encarregado"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Intruso\",\n  \"email\": \"intruso@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir encarregado como OUVIDOR (403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/encarregado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "encarregado"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"X\",\n  \"email\": \"x@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir encarregado como ADMIN_PLATAFORMA (403, é a operadora)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/encarregado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "encarregado"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"X\",\n  \"email\": \"x@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir encarregado com dados inválidos (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioDemoId}}/encarregado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioDemoId}}",
+                "encarregado"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"email\": \"ruim\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Minha conta (CIDADAO)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadao}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json();",
+                  "pm.test('acesso aos próprios dados (art. 18, II)', () => pm.expect(c).to.include({email: 'cidadao@demo.gov.br', cpf: '12345678909'}));",
+                  "pm.test('nunca expõe a senha', () => pm.expect(c).to.not.have.any.keys('senha', 'senhaHash'));",
+                  "pm.test('link para o aviso de privacidade', () => pm.expect(c._links.privacidade.href).to.include('/privacidade'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Minha conta (SERVIDOR, também é titular)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenServidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('sem campos de cidadão', () => pm.expect(pm.response.json().cpf).to.be.null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Minha conta (ADMIN_PLATAFORMA, sem município)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('municipioId nulo', () => pm.expect(pm.response.json().municipioId).to.be.null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Minha conta sem token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Corrigir minha conta (art. 18, III)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadaoNovo}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João Corrigido\",\n  \"email\": \"joao.corrigido{{$timestamp}}@teste.com\",\n  \"telefone\": \"41977776666\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('dados corrigidos', () => pm.expect(pm.response.json()).to.include({nome: 'João Corrigido', telefone: '41977776666'}));",
+                  "pm.collectionVariables.set('emailCidadaoNovo', pm.response.json().email);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Corrigir com e-mail de outra conta (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadaoNovo}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João\",\n  \"email\": \"cidadao@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Corrigir com CPF inválido (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadaoNovo}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João\",\n  \"email\": \"{{emailCidadaoNovo}}\",\n  \"cpf\": \"12345678900\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SERVIDOR informando CPF (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenServidor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Servidor de Obras\",\n  \"email\": \"servidor@demo.gov.br\",\n  \"cpf\": \"52998224725\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Encerrar conta como SERVIDOR (403)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenServidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Encerrar minha conta (cidadão)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/minha-conta",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "minha-conta"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadaoNovo}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.test('explica por que os dados são conservados (art. 18, § 4º, II)', () => pm.expect(r.fundamentacao.join(' ')).to.include('Lei 8.159/1991'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login da conta encerrada (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailCidadaoNovo}}\",\n  \"senha\": \"senhaforte123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
                 ]
               }
             }
