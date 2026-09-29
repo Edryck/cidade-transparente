@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -35,6 +36,8 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService, ObjectMapper mapper) throws Exception {
+        AuthenticationEntryPoint naoAutenticado = (req, res, ex) ->
+                escreverErro(res, mapper, HttpStatus.UNAUTHORIZED, "Token ausente, inválido ou expirado");
         http
                 // API stateless com token no header: sem sessão, sem cookie, então CSRF não se aplica
                 .csrf(AbstractHttpConfigurer::disable)
@@ -46,16 +49,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/protocolos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/municipios/ativos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/municipios/*/privacidade").permitAll()
+                        // Pública para a denúncia anônima; com token, o service exige perfil CIDADAO
+                        .requestMatchers(HttpMethod.POST, "/api/v1/manifestacoes").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // Sem isso, qualquer erro encaminhado para /error viraria 401
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint((req, res, ex) ->
-                                escreverErro(res, mapper, HttpStatus.UNAUTHORIZED, "Token ausente, inválido ou expirado"))
+                        .authenticationEntryPoint(naoAutenticado)
                         .accessDeniedHandler((req, res, ex) ->
                                 escreverErro(res, mapper, HttpStatus.FORBIDDEN, "Seu perfil não tem permissão para este recurso")))
-                .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtFilter(jwtService, naoAutenticado), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
