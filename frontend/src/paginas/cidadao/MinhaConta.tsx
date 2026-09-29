@@ -10,6 +10,7 @@ import { Carregando, ErroCarregamento } from '../../componentes/Estados'
 import { encerrarSessao } from '../../contextos/sessao'
 import { dataCurta, diaDoInstante } from '../../util/datas'
 import { useCarregar } from '../../util/useCarregar'
+import { useEnvioUnico } from '../../util/useEnvioUnico'
 import { useTitulo } from '../../util/useTitulo'
 import { cpfValido, EMAIL } from '../../util/validacao'
 
@@ -27,6 +28,7 @@ export default function MinhaConta() {
       <h1>Minha conta</h1>
       <p>Seus dados ficam visíveis só para você e para a ouvidoria. <Link to="/privacidade">Aviso de privacidade</Link></p>
       <FormConta conta={estado.dados} />
+      <FormSenha />
       <EncerrarConta aoEncerrar={setEncerramento} />
     </>
   )
@@ -94,6 +96,59 @@ function FormConta({ conta }: { conta: Conta }) {
       </CampoFormulario>
       <Botao type="submit" enviando={salvando} textoEnviando="Salvando…">Salvar alterações</Botao>
     </form>
+  )
+}
+
+/** Senha atual obrigatória; os campos são limpos depois de salvar e nunca vão para armazenamento. */
+function FormSenha() {
+  const vazio = { atual: '', nova: '', confirmacao: '' }
+  const [campos, setCampos] = useState(vazio)
+  const [erros, setErros] = useState<Record<string, string>>({})
+  const [mensagem, setMensagem] = useState<{ tipo: 'sucesso' | 'erro'; texto: string } | null>(null)
+  const { enviando, executar } = useEnvioUnico()
+  const alterar = (c: keyof typeof campos) => (e: { target: { value: string } }) => setCampos((v) => ({ ...v, [c]: e.target.value }))
+
+  function salvar(evento: FormEvent) {
+    evento.preventDefault()
+    const e: Record<string, string> = {}
+    if (!campos.atual) e.atual = 'Informe a senha atual'
+    if (campos.nova.length < 8 || campos.nova.length > 72) e.nova = 'A nova senha precisa ter de 8 a 72 caracteres'
+    else if (campos.nova === campos.atual) e.nova = 'A nova senha precisa ser diferente da atual'
+    if (campos.confirmacao !== campos.nova) e.confirmacao = 'A confirmação precisa ser igual à nova senha'
+    setErros(e)
+    setMensagem(null)
+    if (Object.keys(e).length) return
+    executar(async () => {
+      try {
+        await contaApi.alterarSenha(campos.atual, campos.nova)
+        setCampos(vazio)
+        setMensagem({ tipo: 'sucesso', texto: 'Senha alterada. Use a nova senha no próximo acesso.' })
+      } catch (erro) {
+        const f = erro instanceof FalhaApi ? erro : new FalhaApi(500, 'Não foi possível alterar a senha agora.')
+        if (/atual/i.test(f.message)) setErros({ atual: f.message })
+        else if (f.campos.novaSenha || /nova senha/i.test(f.message)) setErros({ nova: f.campos.novaSenha ?? f.message })
+        else setMensagem({ tipo: 'erro', texto: f.message })
+      }
+    })
+  }
+
+  return (
+    <section className="secao">
+      <h2>Alterar senha</h2>
+      <form onSubmit={salvar} noValidate className="formulario">
+        <div aria-live="polite">{mensagem && <Alerta tipo={mensagem.tipo}><p>{mensagem.texto}</p></Alerta>}</div>
+        <CampoFormulario id="senha-atual" rotulo="Senha atual" obrigatorio erro={erros.atual}>
+          {(p) => <input {...p} type="password" autoComplete="current-password" value={campos.atual} onChange={alterar('atual')} />}
+        </CampoFormulario>
+        <CampoFormulario id="senha-nova" rotulo="Nova senha" obrigatorio erro={erros.nova} ajuda="De 8 a 72 caracteres.">
+          {(p) => <input {...p} type="password" autoComplete="new-password" maxLength={72} value={campos.nova} onChange={alterar('nova')} />}
+        </CampoFormulario>
+        <CampoFormulario id="senha-confirmacao" rotulo="Confirmar nova senha" obrigatorio erro={erros.confirmacao}>
+          {(p) => <input {...p} type="password" autoComplete="new-password" maxLength={72} value={campos.confirmacao} onChange={alterar('confirmacao')} />}
+        </CampoFormulario>
+        <Botao type="submit" enviando={enviando} textoEnviando="Salvando…">Alterar senha</Botao>
+      </form>
+    </section>
   )
 }
 
