@@ -1,26 +1,48 @@
-/* Tokens do DESIGN.md. O município pode trocar só --destaque e --destaque-forte (ver contextos/MunicipioContext). */
+/* Tokens do DESIGN.md (seção 40). Nenhuma cor fora daqui. O município pode trocar só --azul e --azul-escuro. */
 :root {
-  --papel: #f5f0e4;
-  --papel-alto: #fbf8f0;
-  --papel-baixo: #e9e2d0;
-  --tinta: #17202e;
-  --tinta-suave: #4a5567;
-  --linha: rgb(23 32 46 / 14%);
-  --linha-forte: rgb(23 32 46 / 30%);
-  --destaque: #1f4e79;
-  --destaque-forte: #163a5b;
-  --carimbo: #a8341f;
-  --no-prazo: #2f6b4a;
-  --atencao: #8a5a00;
-  --sigilo: #5a3e7a;
+  --azul: #007ab9;
+  --azul-escuro: #005a8c;
+  --azul-claro: #e8f4fa;
+  --verde: #008219;
+  --verde-claro: #eaf6ec;
+  --amarelo: #ffa300;
+  --amarelo-claro: #fff4dd;
+  --vermelho: #c62828;
+  --vermelho-claro: #fdecec;
 
-  --fonte-titulo: 'Newsreader', Georgia, serif;
-  --fonte-texto: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
-  --fonte-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --fundo: #f7f8fa;
+  --superficie: #ffffff;
+  --superficie-secundaria: #f1f3f5;
+  --borda: #d9dee3;
+  --texto: #1f2933;
+  --texto-secundario: #52606d;
+  --texto-terciario: #697586;
+  --branco: #ffffff;
 
-  --raio: 6px;
-  --raio-badge: 4px;
-  --transicao: 140ms ease-out;
-  --coluna: 640px;
-  --alvo: 56px;
+  /* Rawline (DESIGN.md, seção 7) não está no projeto; o fallback oficial é a fonte do sistema */
+  --fonte: Rawline, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fonte-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --raio-sm: 4px;
+  --raio-md: 6px;
+  --raio-lg: 8px;
+
+  --espaco-1: 4px;
+  --espaco-2: 8px;
+  --espaco-3: 12px;
+  --espaco-4: 16px;
+  --espaco-5: 24px;
+  --espaco-6: 32px;
+  --espaco-7: 40px;
+  --espaco-8: 48px;
+  --espaco-9: 64px;
+
+  --sombra-flutuante: 0 4px 16px rgb(31 41 51 / 10%);
+  --foco: 0 0 0 3px color-mix(in srgb, var(--azul) 35%, transparent);
+  --transicao: 150ms ease-out;
+  --alvo: 48px;
+  --largura-pagina: 1200px;
+  --largura-coluna: 720px;
+  --largura-leitura: 800px;
+  --largura-estreita: 460px;
 }

@@ -19,7 +19,8 @@ type Contexto = {
 }
 
 const CHAVE = 'ct.municipio'
-const PAPEL = '#F5F0E4'
+// Cor da prefeitura só entra se o texto branco dos botões continuar legível (4.5:1)
+const BRANCO = '#FFFFFF'
 const MunicipioCtx = createContext<Contexto | null>(null)
 
 function ler(): MunicipioEscolhido | null {
@@ -31,7 +32,7 @@ function ler(): MunicipioEscolhido | null {
   }
 }
 
-/** Escurece a cor em 20% para o estado pressionado (--destaque-forte). */
+/** Escurece a cor em 20% para o hover (--azul-escuro). */
 function escurecer(hex: string): string {
   const canais = [1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * 0.8))
   return '#' + canais.map((c) => c.toString(16).padStart(2, '0')).join('')
@@ -40,16 +41,16 @@ function escurecer(hex: string): string {
 export function MunicipioProvider({ children }: { children: ReactNode }) {
   const [municipio, setMunicipio] = useState<MunicipioEscolhido | null>(ler)
 
-  // DESIGN.md: o município troca só --destaque, e só se contrastar 4.5:1 com o papel; senão fica o padrão
+  // O município troca só a cor de ação (--azul), e só se ela contrastar 4.5:1 com o branco; senão fica o padrão
   useEffect(() => {
     const raiz = document.documentElement.style
     const cor = municipio?.corDestaque
-    if (hexValido(cor) && contraste(cor, PAPEL) >= 4.5) {
-      raiz.setProperty('--destaque', cor)
-      raiz.setProperty('--destaque-forte', escurecer(cor))
+    if (hexValido(cor) && contraste(cor, BRANCO) >= 4.5) {
+      raiz.setProperty('--azul', cor)
+      raiz.setProperty('--azul-escuro', escurecer(cor))
     } else {
-      raiz.removeProperty('--destaque')
-      raiz.removeProperty('--destaque-forte')
+      raiz.removeProperty('--azul')
+      raiz.removeProperty('--azul-escuro')
     }
   }, [municipio])
 
