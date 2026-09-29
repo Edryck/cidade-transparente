@@ -67,4 +67,5 @@ A documentação completa do domínio, entidades, regras de negócio e endpoints
 - Perguntar antes de adicionar dependência nova não listada na stack acima.
 - Ao criar uma entidade, sempre perguntar (ou verificar `docs/documentacao-previa.md`) se ela precisa de migration Flyway correspondente antes de considerar a tarefa concluída.
 - Endpoints de ação usam substantivo, não verbo (`POST /manifestacoes/{id}/encaminhamento`, não `/encaminhar`).
+- Regras de transição da manifestação ficam só em `FluxoManifestacao.impedimento()`: a mesma função valida a ação (409) e gera os links. Nunca duplicar uma regra de estado no controller ou no service.
 - Ao implementar HATEOAS, os `_links` retornados variam de acordo com o estado da entidade (ex.: manifestação `ENCERRADA` não retorna link de ação nenhum) — isso é requisito central do exame, não detalhe cosmético.

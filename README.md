@@ -51,7 +51,13 @@ flutter run -d chrome
 
 ### 4. Testes dos endpoints
 
-Importe a coleção `postman/CidadeTransparente.postman_collection.json` no Postman ou Insomnia. Rode primeiro a requisição de login para obter o token — as demais já usam a variável de ambiente da coleção automaticamente.
+Importe a coleção `postman/CidadeTransparente.postman_collection.json` no Postman ou Insomnia e rode-a **inteira, na ordem**: as primeiras pastas fazem login com cada perfil e guardam em variáveis os tokens e ids que as seguintes usam. Os testes de anexo enviam os arquivos de `postman/arquivos/` (no Postman, confira o diretório de trabalho nas configurações).
+
+Pela linha de comando, com o backend rodando:
+
+```bash
+npx newman run postman/CidadeTransparente.postman_collection.json --working-dir postman
+```
 
 ## Configuração
 
@@ -80,6 +86,8 @@ Criados pela migration repeatable `db/dev/R__seed_dados_demo.sql`, carregada só
 | OUVIDOR (outro município) | ouvidor@outra.gov.br | ouvidor123 |
 
 O seed cria dois municípios fictícios (Vila Serena e Campo Aurora) para demonstrar o isolamento: o ouvidor de um não enxerga as manifestações do outro.
+
+As manifestações de demonstração podem ser consultadas sem login em `GET /api/v1/protocolos/{protocolo}`, com o header `X-Chave-Acesso: DEMO-` seguido dos 6 últimos dígitos do protocolo (ex.: `2026-9999901-000004` → `DEMO-000004`). Manifestações novas recebem chave aleatória, mostrada uma única vez na abertura.
 
 ## Estrutura do projeto
 

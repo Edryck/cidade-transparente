@@ -56,7 +56,7 @@ Meta do exame é 10 ou mais. Ficam 12 no núcleo e 2 de reserva que podem cair s
 | 11 | `Recurso` | Cidadão contesta a resposta (a LAI prevê fase recursal) |
 | 12 | `PrazoLegal` | Regra de prazo por tipo: dias base, prorrogação permitida, dias de prorrogação |
 | 13 | `Notificacao` (reserva) | Aviso de prazo próximo do vencimento |
-| 14 | `Auditoria` (reserva) | Log de quem fez o quê |
+| 14 | `Auditoria` | Registro de acesso (IP por 6 meses, Marco Civil art. 15) e trilha de quem fez o quê (LGPD art. 37). Deixou de ser reserva: tem base legal própria, ver `lgpd.md` |
 
 **Relacionamentos principais:** Município 1:N Usuário, Secretaria e Manifestação. Manifestação N:1 Cidadão, TipoManifestação e Secretaria. Manifestação 1:N Anexo, Trâmite e Resposta. Resposta 1:1 Recurso (instância única). Usuário SERVIDOR N:1 Secretaria. TipoManifestação 1:N PrazoLegal: uma regra federal (`municipio_id` nulo) e, opcionalmente, uma por município que a sobrescreve (art. 45 da LAI permite regulamentação local).
 
@@ -73,13 +73,17 @@ Desvios: `EM_RECURSO` (depois de respondida, só LAI), `ARQUIVADA` (a partir de 
 | RECEBIDA | análise (OUVIDOR) | EM_ANALISE |
 | EM_ANALISE | encaminhamento (OUVIDOR) | ENCAMINHADA |
 | ENCAMINHADA | reencaminhamento (OUVIDOR) | ENCAMINHADA |
-| RECEBIDA, EM_ANALISE | arquivamento (OUVIDOR) | ARQUIVADA |
-| ENCAMINHADA | resposta (SERVIDOR da secretaria) | RESPONDIDA |
-| RESPONDIDA | recurso (CIDADAO, só tipo com `permite_recurso`, dentro do prazo) | EM_RECURSO |
-| EM_RECURSO | julgamento deferido / indeferido (OUVIDOR) | ENCAMINHADA / ENCERRADA |
-| RESPONDIDA | encerramento (OUVIDOR) | ENCERRADA |
+| RECEBIDA, EM_ANALISE | arquivamento com justificativa (OUVIDOR) | ARQUIVADA |
+| ENCAMINHADA | resposta (SERVIDOR da secretaria); em pedido LAI, com resultado: CONCEDIDO, PARCIALMENTE_CONCEDIDO, NEGADO ou INEXISTENTE | RESPONDIDA |
+| RESPONDIDA | recurso (CIDADAO requerente; só LAI; só contra NEGADO ou PARCIALMENTE_CONCEDIDO, LAI art. 15; dentro do prazo; um por manifestação) | EM_RECURSO |
+| EM_RECURSO | julgamento deferido, com prazo fixado para a nova resposta / indeferido (OUVIDOR) | ENCAMINHADA / ENCERRADA |
+| RESPONDIDA | encerramento (OUVIDOR), bloqueado enquanto o requerente ainda pode recorrer | ENCERRADA |
 
-**Prorrogação não é status**: é a flag `prorrogada` na manifestação (permitida em RECEBIDA, EM_ANALISE e ENCAMINHADA). Como status, ela apagaria a etapa em que a manifestação estava.
+As regras ficam em um lugar só (`FluxoManifestacao`): a mesma função valida a ação (409 com o motivo) e decide os links HATEOAS, então o cliente nunca recebe link para uma ação que a API recusaria.
+
+**Prorrogação não é status**: é a flag `prorrogada` na manifestação (permitida em RECEBIDA, EM_ANALISE e ENCAMINHADA, antes do vencimento). Como status, ela apagaria a etapa em que a manifestação estava. Gera trâmite visível ao requerente, que precisa ser cientificado (LAI art. 11, § 2º).
+
+**Contagem de prazo** (Lei 9.784, art. 66): exclui o dia do começo, inclui o do vencimento, dias corridos; vencimento em sábado ou domingo passa ao primeiro dia útil. **Limitação conhecida:** feriados ainda não são considerados; a correção é um calendário de feriados em dado.
 
 **Prazos (da pesquisa de mercado):**
 - Ouvidoria (Lei 13.460/2017): 30 dias, prorrogável uma vez por mais 30
@@ -91,7 +95,7 @@ Desvios: `EM_RECURSO` (depois de respondida, só LAI), `ARQUIVADA` (a partir de 
 - Recurso só existe para LAI (arts. 15 e 16 da Lei 12.527): 10 dias para interpor, 5 para julgar, julgado pelo OUVIDOR. A Lei 13.460 (ouvidoria) não prevê fase recursal
 
 **Outras regras:**
-- Protocolo gerado no formato `ANO-MUNICIPIO-SEQUENCIAL`
+- Protocolo no formato `ANO-IBGE-SEQUENCIAL`, com o sequencial por município e ano gerado em um único comando atômico. Na abertura, o sistema entrega uma chave de acesso aleatória (só o hash é guardado) para a consulta pública
 - Isolamento por município: o `municipioId` vem do token e filtra toda consulta. Ouvidor de uma cidade nunca vê dados de outra
 - Manifestação anônima só para tipos com `permite_anonimo` (denúncia); pedido LAI exige identificação. O cidadão anônimo não recebe notificação
 - Resposta só pode ser dada por servidor da secretaria para a qual a manifestação foi encaminhada
@@ -126,12 +130,12 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Usuários | CRUD `/usuarios` (ADMIN, só a equipe: ADMIN/OUVIDOR/SERVIDOR; filtro `?perfil=`). Conta de cidadão é invisível para o ADMIN (404). DELETE desativa, não apaga |
 | Privacidade (LGPD) | `GET /municipios/{id}/privacidade` (público), `PUT /municipios/{id}/encarregado` (ADMIN), `GET/PUT/DELETE /minha-conta` (direitos do titular). Ver `docs/lgpd.md` |
 | Tipos e prazos | `GET /tipos-manifestacao`, `GET /tipos-manifestacao/{id}`, `PUT/DELETE /tipos-manifestacao/{id}/prazo` (regra municipal; DELETE volta à federal) |
-| Manifestações | `POST /manifestacoes`, `GET /manifestacoes` (filtros + paginação), `GET /manifestacoes/{id}` |
+| Manifestações | `POST /manifestacoes` (CIDADAO, ou sem token para denúncia anônima), `GET /manifestacoes` (filtros `status`, `tipoId`, `secretariaId`, `vencimentoAte` + paginação), `GET /manifestacoes/{id}`. ADMIN não vê manifestações |
 | Ações | `POST /manifestacoes/{id}/analise`, `/encaminhamento`, `/prorrogacao`, `/arquivamento`, `/encerramento` |
-| Anexos | `POST/GET /manifestacoes/{id}/anexos` |
+| Anexos | `POST/GET /manifestacoes/{id}/anexos`, `GET /manifestacoes/{id}/anexos/{anexoId}` (download). Só PDF/PNG/JPEG até 5 MB |
 | Trâmites | `GET /manifestacoes/{id}/tramites` |
-| Respostas | `POST /manifestacoes/{id}/respostas` |
-| Recursos | `POST /respostas/{id}/recursos`, `PUT /recursos/{id}` (julgar) |
+| Respostas | `POST/GET /manifestacoes/{id}/respostas`, `GET /manifestacoes/{id}/respostas/{respostaId}` |
+| Recursos | `POST /respostas/{id}/recursos`, `GET/PUT /recursos/{id}` (PUT = julgar) |
 | Público | `GET /protocolos/{numero}` (exige a chave de acesso entregue na abertura: protocolo sequencial não é credencial), `GET /municipios/ativos`, `GET /municipios/{id}/privacidade` |
 | Relatórios | `GET /relatorios/gestao?ano=` (total por tipo, por secretaria, % no prazo) |
 
@@ -221,6 +225,6 @@ A avaliação pesa demonstração de domínio, então cada decisão acima precis
 
 ## 15. Riscos
 
-- **Escopo inchar:** se apertar, cortam-se `Notificacao` e `Auditoria` (entidades 13 e 14) e o relatório. O núcleo de 12 já cumpre o exame
+- **Escopo inchar:** se apertar, corta-se `Notificacao` e o relatório. O núcleo de 13 entidades já cumpre o exame
 - **HATEOAS complicar o frontend:** começar com links só em `Manifestacao` e expandir se der
 - **Vídeos deixados pro final:** gravar o vídeo de testes assim que a coleção Postman ficar pronta, sem esperar o frontend

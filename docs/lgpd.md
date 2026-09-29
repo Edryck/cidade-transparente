@@ -7,7 +7,7 @@ Como o sistema trata dados pessoais e qual artigo de lei fundamenta cada decisã
 
 A regra do projeto é: **a lei vem antes da conveniência**. Se uma funcionalidade conflitar com a LGPD, a LAI ou a Lei 13.460, muda-se a funcionalidade.
 
-Legenda: ✅ implementado · ⏳ planejado (etapa indicada)
+Legenda: ✅ implementado · limitações conhecidas estão indicadas no próprio texto
 
 ---
 
@@ -35,15 +35,15 @@ Uma caixa de "li e aceito" seria **juridicamente errada**, porque sugere que o c
 
 | Dado | Onde fica | Finalidade | Base legal | Quem acessa | Retenção |
 |---|---|---|---|---|---|
-| Nome, e-mail | `usuario`, `cidadao` | Identificar o manifestante e permitir o login | art. 7º, III | O próprio titular e o OUVIDOR (⏳ manifestação) | Enquanto a conta existir; depois, junto às manifestações (art. 16, I) |
+| Nome, e-mail | `usuario`, `cidadao` | Identificar o manifestante e permitir o login | art. 7º, III | O próprio titular e o OUVIDOR ✅ | Enquanto a conta existir; depois, junto às manifestações (art. 16, I) |
 | Senha | `usuario.senha_hash` | Autenticação | art. 7º, III | Ninguém: só o hash BCrypt é guardado ✅ | Enquanto a conta existir |
 | CPF (opcional) | `cidadao.cpf` | Distinguir homônimos | art. 7º, III | O próprio titular e o OUVIDOR | Como o nome |
 | Telefone (opcional) | `cidadao.telefone` | Contato sobre a manifestação | art. 7º, III | O próprio titular e o OUVIDOR | Como o nome |
-| Conteúdo da manifestação e anexos | `manifestacao`, `anexo` | Atender a manifestação | art. 7º, II; art. 11, II, "a" e "b" | OUVIDOR e o SERVIDOR da secretaria destinatária | Tabela de temporalidade do município (Lei 8.159/1991, art. 9º) |
-| Identidade de quem se manifesta | `manifestacao.cidadao_id` | Resposta e eventual apuração | Lei 13.460, art. 10, § 7º | **Só o OUVIDOR** e o próprio cidadão, nunca o SERVIDOR (⏳ manifestação) | Acesso restrito por até 100 anos (LAI, art. 31, § 1º, I) |
+| Conteúdo da manifestação e anexos | `manifestacao`, `anexo` | Atender a manifestação | art. 7º, II; art. 11, II, "a" e "b" | OUVIDOR e o SERVIDOR da secretaria destinatária ✅ | Tabela de temporalidade do município (Lei 8.159/1991, art. 9º) |
+| Identidade de quem se manifesta | `manifestacao.cidadao_id` | Resposta e eventual apuração | Lei 13.460, art. 10, § 7º | **Só o OUVIDOR** e o próprio cidadão, nunca o SERVIDOR ✅ | Acesso restrito por até 100 anos (LAI, art. 31, § 1º, I) |
 | Dados da equipe | `usuario` | Autoria dos atos administrativos | art. 23 | O ADMIN do mesmo município | Conta desativada é conservada para rastrear quem praticou cada ato |
-| Registro de acesso (IP, data, hora) | `auditoria` (⏳) | Atender ordem judicial (Marco Civil, art. 15) | art. 7º, II | Ninguém pelo sistema; só por ordem judicial | **6 meses**, depois o IP é apagado |
-| Trilha de acesso à identidade | `auditoria` (⏳) | Prestação de contas (art. 37; Decreto 10.153, art. 6º, § 3º) | art. 7º, II | Controle interno da prefeitura | Junto com a manifestação |
+| Registro de acesso (IP, data, hora) | `auditoria` ✅ | Atender ordem judicial (Marco Civil, art. 15) | art. 7º, II | Ninguém pelo sistema; só por ordem judicial | **6 meses**, depois o IP é apagado |
+| Trilha de acesso à identidade | `auditoria` ✅ | Prestação de contas (art. 37; Decreto 10.153, art. 6º, § 3º) | art. 7º, II | Controle interno da prefeitura | Junto com a manifestação |
 
 **O que o sistema não coleta:** data de nascimento, endereço, gênero, localização, dados de navegação. Nada disso é necessário para a ouvidoria (art. 6º, III). O token JWT carrega só id, perfil e município: nenhum dado pessoal legível. ✅
 
@@ -52,13 +52,13 @@ Uma caixa de "li e aceito" seria **juridicamente errada**, porque sugere que o c
 | Princípio | Como o sistema cumpre |
 |---|---|
 | I. Finalidade / II. Adequação | Os dados só servem à ouvidoria e à LAI. Não há uso para marketing nem venda (declarado no aviso) ✅ |
-| III. Necessidade | CPF e telefone são opcionais. O ADMIN não enxerga contas de cidadãos (`/usuarios` lista só a equipe, e conta de cidadão responde 404) ✅. O SERVIDOR não verá a identidade do manifestante ⏳ |
+| III. Necessidade | CPF e telefone são opcionais. O ADMIN não enxerga contas de cidadãos (`/usuarios` lista só a equipe, e conta de cidadão responde 404) ✅. O SERVIDOR não vê a identidade do manifestante, nem no histórico (onde o cidadão aparece como "Manifestante") ✅ |
 | IV. Livre acesso | `GET /minha-conta` para todos os perfis, inclusive a equipe ✅ |
 | V. Qualidade | `PUT /minha-conta` corrige os dados e mantém `cidadao` sincronizado com `usuario` ✅ |
 | VI. Transparência | Aviso de privacidade público, versionado, com base legal e retenção de cada tratamento ✅ |
 | VII. Segurança / VIII. Prevenção | Ver seção 7 |
 | IX. Não discriminação | O sistema não toma decisão automatizada sobre o cidadão |
-| X. Responsabilização | Este documento, a versão do aviso, a trilha de auditoria ⏳ e as regras reforçadas no banco (CHECK e FKs) |
+| X. Responsabilização | Este documento, a versão do aviso, a trilha de auditoria ✅ e as regras reforçadas no banco (CHECK e FKs) |
 
 ## 5. Direitos do titular (art. 18)
 
@@ -80,8 +80,10 @@ Uma caixa de "li e aceito" seria **juridicamente errada**, porque sugere que o c
 
 O cidadão escolhe entre duas formas de se manifestar:
 
-1. **Identificado:** logado. A identidade é restrita ao OUVIDOR (Lei 13.460, art. 10, § 7º; Lei 13.608, art. 4º-B). Antes de ir à secretaria, a manifestação é pseudonimizada, ou seja, segue sem a identificação (Decreto 10.153, art. 6º, § 4º, usado como referência). ⏳
-2. **Anônimo:** sem login, só para tipos com `permite_anonimo` (a denúncia). Fica `cidadao_id = NULL`, e o acompanhamento é feito pelo protocolo mais uma chave de acesso. ⏳
+1. **Identificado:** logado. A identidade é restrita ao OUVIDOR (Lei 13.460, art. 10, § 7º; Lei 13.608, art. 4º-B). Antes de ir à secretaria, a manifestação é pseudonimizada, ou seja, segue sem a identificação (Decreto 10.153, art. 6º, § 4º, usado como referência). ✅
+2. **Anônimo:** sem login, só para tipos com `permite_anonimo` (a denúncia). Fica `cidadao_id = NULL`, e o acompanhamento é feito pelo protocolo mais uma chave de acesso. ✅
+
+Um token enviado mas inválido responde 401, inclusive na abertura: seguir como anônimo faria a denúncia de um cidadão com token expirado virar anônima sem ele saber. ✅
 
 **Com ordem judicial**, a prefeitura entrega o que tiver (LAI, art. 31, § 3º, III; Marco Civil, arts. 10, § 1º, e 22):
 
@@ -104,9 +106,9 @@ A denúncia anônima é válida para iniciar uma apuração preliminar, mas sozi
 | Mensagem de login idêntica para e-mail inexistente e senha errada | ✅ |
 | Erros padronizados (ProblemDetail) sem dado pessoal nem stack trace | ✅ |
 | Rota pública nunca expõe dado pessoal | ✅ |
-| Consulta por protocolo exige chave de acesso aleatória, guardada só como hash. Sem ela, o protocolo sequencial permitiria percorrer e ler manifestações alheias | ⏳ manifestação |
-| Trilha de quem acessou a identidade do manifestante | ⏳ manifestação |
-| Anexos com tipo e tamanho restritos (5 MB no banco) | ✅ tamanho · ⏳ tipos |
+| Consulta por protocolo exige chave de acesso aleatória (12 caracteres, cerca de 2^59 combinações), guardada só como hash SHA-256 e enviada no header, não na URL. Protocolo inexistente e chave errada dão o mesmo 404 | ✅ |
+| Trilha de quem acessou a identidade do manifestante | ✅ |
+| Anexos: só PDF, PNG e JPEG, identificados pelos bytes do arquivo (não pela extensão), até 5 MB, entregues sempre como download (`Content-Disposition: attachment`) | ✅ |
 | HTTPS obrigatório | Fora do código: configuração de implantação |
 
 **Limitação conhecida:** um token emitido antes do encerramento da conta continua válido até expirar (no máximo 2h). Revogar tokens na hora exigiria consultar o banco a cada requisição. O token curto é o equilíbrio escolhido.
@@ -118,23 +120,24 @@ A denúncia anônima é válida para iniciar uma apuração preliminar, mas sozi
 | Manifestações, trâmites, respostas e anexos | Tabela de temporalidade de documentos de cada prefeitura (Lei 8.159/1991). O sistema **nunca apaga sozinho** |
 | Identificação do manifestante | Acesso restrito por até 100 anos (LAI, art. 31) |
 | Contas encerradas ou desativadas | Conservadas, com login bloqueado (art. 16, I) |
-| IP do registro de acesso | Apagado depois de 6 meses por uma rotina diária ⏳ |
+| IP do registro de acesso | Apagado depois de 6 meses por uma rotina diária (03h30), que mantém o restante do registro ✅ |
 
 ## 9. Incidentes de segurança
 
 A prefeitura (controladora) comunica à ANPD e aos titulares afetados, em **até 3 dias úteis** a partir de quando soube que o incidente atingiu dados pessoais, todo incidente que possa gerar risco ou dano relevante (art. 48; Resolução CD/ANPD nº 15/2024).
 
-A empresa da plataforma (operadora) avisa a prefeitura imediatamente. A comunicação precisa conter os itens do art. 48, § 1º: a natureza dos dados, os titulares afetados, as medidas de proteção, os riscos, os motivos de eventual demora e as medidas de mitigação. A trilha de auditoria ⏳ serve para determinar o que foi acessado.
+A empresa da plataforma (operadora) avisa a prefeitura imediatamente. A comunicação precisa conter os itens do art. 48, § 1º: a natureza dos dados, os titulares afetados, as medidas de proteção, os riscos, os motivos de eventual demora e as medidas de mitigação. A trilha de auditoria ✅ serve para determinar o que foi acessado.
 
 ## 10. Riscos e mitigação (relatório de impacto simplificado)
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Retaliação contra quem denuncia, se a identidade vazar para a secretaria denunciada | Alto | Identidade visível só para o OUVIDOR ⏳; denúncia anônima ⏳; trilha de acesso ⏳ |
-| Enumeração de protocolos para ler manifestações alheias | Alto | Chave de acesso obrigatória na consulta pública ⏳ |
+| Retaliação contra quem denuncia, se a identidade vazar para a secretaria denunciada | Alto | Identidade visível só para o OUVIDOR ✅; denúncia anônima ✅; trilha de acesso ✅ |
+| Enumeração de protocolos para ler manifestações alheias | Alto | Chave de acesso obrigatória na consulta pública ✅ |
 | Vazamento de dados de uma prefeitura para outra | Alto | Isolamento no token e no banco ✅ |
 | Operador (plataforma) acessando dados de cidadãos | Médio | `ADMIN_PLATAFORMA` sem acesso ✅; contrato entre operador e controlador (fora do sistema) |
-| Dados sensíveis no texto livre da manifestação | Médio | Acesso restrito por perfil e por secretaria ⏳; base legal no art. 11 |
+| Dados sensíveis no texto livre da manifestação | Médio | Acesso restrito por perfil e por secretaria ✅; base legal no art. 11 |
+| Texto ou anexo que identifica o manifestante (ex.: assinatura num PDF) chega à secretaria | Médio | O sistema não lê o conteúdo: cabe à ouvidoria revisar antes de encaminhar (orientar ouvidores, art. 41, § 2º, III). Limitação conhecida |
 | Vazamento de token | Médio | Validade de 2h ✅; HTTPS (implantação) |
 | Senhas expostas em vazamento do banco | Médio | BCrypt ✅ |
 
