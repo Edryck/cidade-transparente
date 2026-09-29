@@ -9,4 +9,8 @@ import java.util.List;
 public interface MunicipioRepository extends JpaRepository<Municipio, Long> {
 
     List<Municipio> findByAtivoTrueOrderByNomeAsc();
+
+    List<Municipio> findAllByOrderByNomeAsc();
+
+    boolean existsByCodigoIbge(String codigoIbge);
 }
