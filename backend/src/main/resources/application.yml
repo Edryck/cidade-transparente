@@ -28,7 +28,8 @@ spring:
 jwt:
   # Sem default de propósito: a aplicação não sobe sem JWT_SECRET definido
   secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:86400000}
+  # 2h: token curto limita o estrago de um vazamento (LGPD art. 46); o login é barato de refazer
+  expiration: ${JWT_EXPIRATION:7200000}
 
 springdoc:
   swagger-ui:
