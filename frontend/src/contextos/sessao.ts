@@ -53,9 +53,15 @@ export function iniciarSessao(resposta: RespostaLogin): Sessao {
   return sessao
 }
 
-export function encerrarSessao() {
+/**
+ * Remove o token. No "Sair", apaga também os rascunhos desta aba, que podem conter texto da manifestação;
+ * quando a sessão só expira (401), o rascunho fica, para a pessoa não perder o que digitou.
+ */
+export function encerrarSessao(limparRascunhos = false) {
   try {
-    sessionStorage.removeItem(CHAVE)
+    Object.keys(sessionStorage)
+      .filter((chave) => chave === CHAVE || (limparRascunhos && chave.startsWith('ct.rascunho.')))
+      .forEach((chave) => sessionStorage.removeItem(chave))
   } catch {
     // nada a limpar
   }
