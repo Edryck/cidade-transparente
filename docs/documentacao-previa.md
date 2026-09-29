@@ -130,7 +130,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Municípios | `GET/POST /municipios`, `GET/PUT /municipios/{id}` (ADMIN_PLATAFORMA). O POST cria junto o primeiro ADMIN; o código IBGE não muda depois |
 | Secretarias | CRUD `/secretarias` (leitura também para OUVIDOR). DELETE desativa, não apaga |
 | Usuários | CRUD `/usuarios` (ADMIN, só a equipe: ADMIN/OUVIDOR/SERVIDOR; filtro `?perfil=`). Conta de cidadão é invisível para o ADMIN (404). DELETE desativa, não apaga |
-| Privacidade (LGPD) | `GET /municipios/{id}/privacidade` (público), `PUT /municipios/{id}/encarregado` (ADMIN), `GET/PUT/DELETE /minha-conta` (direitos do titular). Ver `docs/lgpd.md` |
+| Privacidade (LGPD) | `GET /municipios/{id}/privacidade` (público), `PUT /municipios/{id}/encarregado` (ADMIN), `GET/PUT/DELETE /minha-conta` (direitos do titular), `PUT /minha-conta/senha` (troca de senha, exige a atual). Ver `docs/lgpd.md` |
 | Tipos e prazos | `GET /tipos-manifestacao`, `GET /tipos-manifestacao/{id}`, `PUT/DELETE /tipos-manifestacao/{id}/prazo` (regra municipal; DELETE volta à federal) |
 | Manifestações | `POST /manifestacoes` (CIDADAO, ou sem token para denúncia anônima), `GET /manifestacoes` (filtros `status`, `tipoId`, `secretariaId`, `vencimentoAte` + paginação), `GET /manifestacoes/{id}`. ADMIN não vê manifestações |
 | Ações | `POST /manifestacoes/{id}/analise`, `/encaminhamento`, `/prorrogacao`, `/arquivamento`, `/encerramento` |

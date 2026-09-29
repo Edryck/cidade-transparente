@@ -99,6 +99,7 @@ A denúncia anônima é válida para iniciar uma apuração preliminar, mas sozi
 | Medida | Situação |
 |---|---|
 | Senha só como hash BCrypt | ✅ |
+| Troca de senha exige a senha atual e fica registrada na auditoria. Tokens já emitidos valem até expirar (2h) | ✅ |
 | Token JWT assinado (HS256), segredo de no mínimo 32 bytes, fora do repositório | ✅ |
 | Token com validade de 2h, que limita o estrago de um vazamento | ✅ |
 | Isolamento entre prefeituras no código (token) e no banco (FKs compostas) | ✅ |
