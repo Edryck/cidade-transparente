@@ -9,13 +9,13 @@ import br.edu.utfpr.cidadetransparente.domain.Resposta;
 import br.edu.utfpr.cidadetransparente.domain.StatusManifestacao;
 import br.edu.utfpr.cidadetransparente.domain.StatusRecurso;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static br.edu.utfpr.cidadetransparente.domain.StatusManifestacao.*;
 
@@ -51,7 +51,7 @@ public final class FluxoManifestacao {
 
     /** Tudo que as regras consultam, carregado uma vez pelo service. */
     public record Contexto(Manifestacao manifestacao, PrazoLegal prazo, Resposta ultimaResposta, Recurso recurso,
-                           LocalDate hoje) {
+                           LocalDate hoje, Predicate<LocalDate> semExpediente) {
     }
 
     private FluxoManifestacao() {
@@ -139,7 +139,7 @@ public final class FluxoManifestacao {
         if (c.recurso() != null) {
             return "Já houve recurso nesta manifestação (instância única)";
         }
-        LocalDate prazo = prazoRecurso(r, c.prazo());
+        LocalDate prazo = prazoRecurso(r, c.prazo(), c.semExpediente());
         if (c.hoje().isAfter(prazo)) {
             return "Prazo de recurso encerrado em " + prazo.format(DATA);
         }
@@ -157,9 +157,10 @@ public final class FluxoManifestacao {
         Resposta r = c.ultimaResposta();
         boolean recursoAindaPossivel = c.manifestacao().getTipoManifestacao().isPermiteRecurso()
                 && c.recurso() == null && r != null && r.getResultadoLai() != null && r.getResultadoLai().admiteRecurso()
-                && !c.hoje().isAfter(prazoRecurso(r, c.prazo()));
+                && !c.hoje().isAfter(prazoRecurso(r, c.prazo(), c.semExpediente()));
         return recursoAindaPossivel
-                ? "Aguarde o fim do prazo de recurso do requerente (" + prazoRecurso(r, c.prazo()).format(DATA) + ")"
+                ? "Aguarde o fim do prazo de recurso do requerente ("
+                + prazoRecurso(r, c.prazo(), c.semExpediente()).format(DATA) + ")"
                 : null;
     }
 
@@ -172,21 +173,20 @@ public final class FluxoManifestacao {
     }
 
     /** Prazo para recorrer: conta da ciência da resposta, aqui a data em que ela foi registrada no sistema. */
-    public static LocalDate prazoRecurso(Resposta resposta, PrazoLegal prazo) {
+    public static LocalDate prazoRecurso(Resposta resposta, PrazoLegal prazo, Predicate<LocalDate> semExpediente) {
         return somarDias(resposta.getRespondidaEm().atZoneSameInstant(FUSO).toLocalDate(),
-                prazo.getDiasInterposicaoRecurso());
+                prazo.getDiasInterposicaoRecurso(), semExpediente);
     }
 
     /**
      * Contagem de prazo da Lei 9.784/1999, art. 66: exclui o dia do começo, inclui o do vencimento, conta dias
-     * corridos e, se o vencimento cair em dia sem expediente, prorroga para o primeiro dia útil seguinte.
-     * Limitação conhecida: só sábados e domingos são tratados como dia sem expediente. Feriados (nacionais e
-     * municipais) ainda não, então um vencimento em feriado fica um dia antes do legal, tanto no prazo da
-     * administração quanto no prazo de recurso do cidadão. A correção é um calendário de feriados em dado.
+     * corridos e, se o vencimento cair em dia sem expediente (fim de semana ou feriado do calendário do
+     * município, ver FeriadoService), prorroga para o primeiro dia útil seguinte. Vale para os prazos da
+     * administração e para o prazo de recurso do cidadão.
      */
-    public static LocalDate somarDias(LocalDate inicio, int dias) {
+    public static LocalDate somarDias(LocalDate inicio, int dias, Predicate<LocalDate> semExpediente) {
         LocalDate vencimento = inicio.plusDays(dias);
-        while (vencimento.getDayOfWeek() == DayOfWeek.SATURDAY || vencimento.getDayOfWeek() == DayOfWeek.SUNDAY) {
+        while (semExpediente.test(vencimento)) {
             vencimento = vencimento.plusDays(1);
         }
         return vencimento;

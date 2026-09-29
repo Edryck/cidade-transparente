@@ -57,6 +57,7 @@ public class ManifestacaoService {
     private final CidadaoRepository cidadaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final TipoManifestacaoService tipoService;
+    private final FeriadoService feriadoService;
     private final AuditoriaService auditoria;
 
     /** Manifestação já liberada para quem está pedindo, junto com quem pede. */
@@ -118,7 +119,8 @@ public class ManifestacaoService {
         m.setDescricao(request.descricao().trim());
         m.setStatus(RECEBIDA);
         m.setDataAbertura(OffsetDateTime.now());
-        m.setDataLimite(FluxoManifestacao.somarDias(hoje, prazo.getDiasResposta()));
+        m.setDataLimite(FluxoManifestacao.somarDias(hoje, prazo.getDiasResposta(),
+                feriadoService.semExpediente(municipio.getId())));
         m.setChaveAcessoHash(hash(chave));
         manifestacaoRepository.save(m);
 
@@ -272,7 +274,7 @@ public class ManifestacaoService {
         Contexto c = exigir(AcaoManifestacao.PRORROGACAO, a);
         Manifestacao m = c.manifestacao();
         int dias = c.prazo().getDiasProrrogacao();
-        m.setDataLimite(FluxoManifestacao.somarDias(m.getDataLimite(), dias));
+        m.setDataLimite(FluxoManifestacao.somarDias(m.getDataLimite(), dias, c.semExpediente()));
         m.setProrrogada(true);
         // Mesmo status: a prorrogação não é etapa do fluxo, mas é registrada e fica visível ao requerente,
         // que precisa ser cientificado dela (Lei 12.527, art. 11, § 2º)
@@ -326,7 +328,7 @@ public class ManifestacaoService {
         transitar(m, RESPONDIDA, a.ator(), null, "Resposta registrada pela " + m.getSecretaria().getSigla());
         auditoria.registrar(AcaoAuditoria.RESPOSTA_REGISTRADA, m.getMunicipio().getId(), a.ator().usuarioId(),
                 "Resposta", resposta.getId(), null);
-        return paraResposta(resposta, new Contexto(m, c.prazo(), resposta, c.recurso(), c.hoje()));
+        return paraResposta(resposta, new Contexto(m, c.prazo(), resposta, c.recurso(), c.hoje(), c.semExpediente()));
     }
 
     @Transactional
@@ -343,7 +345,8 @@ public class ManifestacaoService {
         Recurso recurso = new Recurso();
         recurso.setResposta(resposta);
         recurso.setJustificativa(request.justificativa().trim());
-        recurso.setDataLimiteJulgamento(FluxoManifestacao.somarDias(c.hoje(), c.prazo().getDiasJulgamentoRecurso()));
+        recurso.setDataLimiteJulgamento(FluxoManifestacao.somarDias(c.hoje(), c.prazo().getDiasJulgamentoRecurso(),
+                c.semExpediente()));
         recursoRepository.save(recurso);
 
         transitar(c.manifestacao(), EM_RECURSO, a.ator(), null, "Recurso interposto pelo requerente; julgamento até "
@@ -424,7 +427,8 @@ public class ManifestacaoService {
                 tipoService.prazoVigente(m.getTipoManifestacao().getId(), m.getMunicipio().getId()),
                 respostaRepository.findFirstByManifestacaoIdOrderByRespondidaEmDescIdDesc(m.getId()).orElse(null),
                 recursoRepository.findByRespostaManifestacaoId(m.getId()).orElse(null),
-                FluxoManifestacao.hoje());
+                FluxoManifestacao.hoje(),
+                feriadoService.semExpediente(m.getMunicipio().getId()));
     }
 
     private void transitar(Manifestacao m, StatusManifestacao novo, Ator ator, Secretaria destino, String descricao) {
@@ -507,7 +511,7 @@ public class ManifestacaoService {
                 && (c.recurso() == null || c.recurso().getResposta().getId().equals(r.getId()));
         return new RespostaResponse(r.getId(), r.getTexto(), r.getResultadoLai(),
                 r.getSecretaria().getSigla(), r.getRespondidaEm(), cabivel,
-                cabivel ? FluxoManifestacao.prazoRecurso(r, c.prazo()) : null,
+                cabivel ? FluxoManifestacao.prazoRecurso(r, c.prazo(), c.semExpediente()) : null,
                 cabivel ? INSTANCIA_RECURSAL : null);
     }
 
