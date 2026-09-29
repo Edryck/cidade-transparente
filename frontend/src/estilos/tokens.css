@@ -1,0 +1,26 @@
+/* Tokens do DESIGN.md. O município pode trocar só --destaque e --destaque-forte (ver contextos/MunicipioContext). */
+:root {
+  --papel: #f5f0e4;
+  --papel-alto: #fbf8f0;
+  --papel-baixo: #e9e2d0;
+  --tinta: #17202e;
+  --tinta-suave: #4a5567;
+  --linha: rgb(23 32 46 / 14%);
+  --linha-forte: rgb(23 32 46 / 30%);
+  --destaque: #1f4e79;
+  --destaque-forte: #163a5b;
+  --carimbo: #a8341f;
+  --no-prazo: #2f6b4a;
+  --atencao: #8a5a00;
+  --sigilo: #5a3e7a;
+
+  --fonte-titulo: 'Newsreader', Georgia, serif;
+  --fonte-texto: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --fonte-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --raio: 6px;
+  --raio-badge: 4px;
+  --transicao: 140ms ease-out;
+  --coluna: 640px;
+  --alvo: 56px;
+}

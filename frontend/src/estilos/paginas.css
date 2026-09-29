@@ -1,0 +1,40 @@
+@layer paginas {
+  .acoes-principais { display: grid; gap: 12px; margin-block: 24px 8px; }
+  @media (min-width: 480px) { .acoes-principais { grid-template-columns: 1fr 1fr; } }
+
+  .lista-municipios { list-style: none; padding: 0; margin: 16px 0 0; border-top: 1px solid var(--linha); }
+  .lista-municipios li {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 0; margin: 0; border-bottom: 1px solid var(--linha);
+  }
+  .lista-municipios-nome { font-weight: 700; }
+
+  .lista-links, .lista-anos { list-style: none; padding: 0; margin: 0; }
+  .lista-links li a, .lista-anos li a { min-height: 48px; display: inline-flex; align-items: center; }
+  .lista-anos li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 16px; border-bottom: 1px solid var(--linha); margin: 0; }
+  .lista-anos li a { font-weight: 700; }
+
+  .dados-formulario { padding: 16px; background: var(--papel-alto); border: 1px solid var(--linha); border-radius: var(--raio); }
+
+  .resultado { padding-top: 32px; border-top: 1px solid var(--linha); }
+  .resultado .protocolo { margin-bottom: 8px; }
+
+  .documento h2 { margin-top: 40px; }
+  .documento-item { padding-block: 12px; border-top: 1px solid var(--linha); }
+  .texto-longo { white-space: pre-line; }
+  .resumo dd { font-size: 18px; }
+}
+
+@media print {
+  @page { margin: 16mm; }
+  body { background: #fff; color: #000; font-size: 12pt; }
+  .cabecalho, .rodape, .pular, .nao-imprimir, .pagina > h1, .pagina > h1 + p { display: none !important; }
+  .pagina { padding: 0; max-width: none; }
+  .comprovante { background: #fff; border-color: #000; padding: 0; margin: 0; }
+  .comprovante * { color: #000 !important; }
+  .selo { border-color: #000; animation: none; }
+  .alerta { background: #fff; border: 1px solid #000; }
+  .alerta-icone { display: none; }
+  .protocolo { font-size: 20pt; }
+  .chave { font-size: 22pt; }
+}
