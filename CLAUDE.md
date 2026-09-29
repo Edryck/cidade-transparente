@@ -25,7 +25,7 @@ A documentação completa do domínio, entidades, regras de negócio e endpoints
 - PostgreSQL + Flyway
 - JWT (jjwt) com Spring Security
 - springdoc-openapi (Swagger UI)
-- Frontend: Flutter Web
+- Frontend: React + Vite (protótipo HTML estático em `prototipo/` antes)
 - Docker Compose só para subir o banco local
 
 ## Convenções de código
@@ -69,3 +69,27 @@ A documentação completa do domínio, entidades, regras de negócio e endpoints
 - Endpoints de ação usam substantivo, não verbo (`POST /manifestacoes/{id}/encaminhamento`, não `/encaminhar`).
 - Regras de transição da manifestação ficam só em `FluxoManifestacao.impedimento()`: a mesma função valida a ação (409) e gera os links. Nunca duplicar uma regra de estado no controller ou no service.
 - Ao implementar HATEOAS, os `_links` retornados variam de acordo com o estado da entidade (ex.: manifestação `ENCERRADA` não retorna link de ação nenhum) — isso é requisito central do exame, não detalhe cosmético.
+- Se o mesmo erro persistir depois de 2 correções, parar e reportar a causa em vez de continuar tentando.
+- Sem refactor, renomeação ou "melhoria" que não foi pedida. Se notar algo fora do escopo, anotar numa linha no resumo final.
+
+## Economia de tokens
+
+- Não reler `docs/documentacao-previa.md` e `docs/lgpd.md` inteiros a cada tarefa: buscar a seção relevante com Grep, ou Read com offset/limit.
+- Não reler arquivo que acabou de editar (Edit já avisa se falhou). Ir direto aos arquivos conhecidos pela estrutura de pacotes, sem varrer o repositório.
+- Filtrar saída de comandos (`mvn -q`, `| tail -30`, `grep`). Nunca despejar log inteiro.
+- Durante o desenvolvimento, rodar só a pasta da coleção Postman afetada. A coleção inteira roda uma vez no fim, com saída resumida (só falhas e totais).
+- Usar Edit em vez de reescrever o arquivo inteiro. Não criar arquivos que não foram pedidos (resumos, notas, docs extras).
+- Não usar subagentes, a menos que o usuário peça. Fazer inline.
+- Se algo já está definido neste arquivo ou na documentação, não perguntar de novo. Se precisar perguntar, juntar tudo numa mensagem só.
+
+## Como se comunicar
+
+- Durante o trabalho: proibido narrar ("agora vou atualizar o arquivo tal"), comentar resultado intermediário, repetir diffs ou tabelas de arquivo editado, e mostrar os comandos rodados.
+- Resposta final: um único resumo, nesta ordem:
+    1. resultado com o número que prova;
+    2. como ficou, por assunto, com o porquê e o artigo da lei;
+    3. erros meus, só se houve;
+    4. commits sugeridos;
+    5. cronograma e uma pergunta objetiva de próximo passo.
+- Commits: nunca executar git add ou git commit, só sugerir. Um bloco por commit, com caminhos completos, tipo(escopo) em português e corpo explicando o porquê. Ordem: migration, depois o que depende dela, testes e docs por último.
+- Formatação: sem elogio de abertura, sem emoji de status, sem termos de terminal (●, Bash(...), Updated ... (+20 -17)).

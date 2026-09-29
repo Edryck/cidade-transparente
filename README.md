@@ -12,14 +12,14 @@ Documentação completa do domínio, entidades, regras de negócio e endpoints e
 - **Banco:** PostgreSQL, versionado com Flyway
 - **Autenticação:** JWT
 - **Documentação da API:** springdoc-openapi (Swagger UI)
-- **Frontend:** Flutter Web
+- **Frontend:** React + Vite
 
 ## Pré-requisitos
 
 - JDK 21
 - Maven (ou o wrapper `./mvnw`, incluído no projeto)
 - Docker e Docker Compose (para o banco local)
-- Flutter SDK (para o frontend)
+- Node.js (para o frontend)
 - Postman ou Insomnia (para rodar a coleção de testes)
 
 ## Como rodar
@@ -45,8 +45,8 @@ A API sobe em `http://localhost:8080`. Documentação interativa (Swagger UI) em
 
 ```bash
 cd frontend
-flutter pub get
-flutter run -d chrome
+npm install
+npm run dev
 ```
 
 ### 4. Testes dos endpoints
@@ -97,5 +97,6 @@ cidade-transparente/
 ├── docs/lgpd.md                 # conformidade com LGPD, LAI e Lei 13.460
 ├── postman/                      # coleção de testes
 ├── backend/                      # API Spring Boot
-└── frontend/                     # app Flutter Web
+├── prototipo/                    # protótipo navegável em HTML (abrir index.html)
+└── frontend/                     # app React
 ```

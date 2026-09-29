@@ -35,7 +35,7 @@ Uma API multi-município: cada prefeitura (tenant) tem seus usuários, secretari
 - **Senha:** BCrypt
 - **Docs da API (extra barato):** springdoc-openapi (Swagger UI)
 - **Testes:** Postman/Insomnia (obrigatório). JUnit de integração só se sobrar tempo
-- **Frontend:** recomendado Flutter Web (stack que já está no projeto pessoal e evita aprender framework novo em cima do prazo). React + Vite é a alternativa
+- **Frontend:** React + Vite (troca decidida em 29/09: para um MVP web de disciplina, Flutter Web não compensa o peso). Antes do código, um protótipo navegável em HTML em `prototipo/` valida as telas
 
 ## 4. Modelo de domínio (14 entidades)
 
