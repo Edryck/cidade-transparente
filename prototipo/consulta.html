@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<title>Acompanhar protocolo - Ouvidoria de Vila Serena</title>
+</head>
+<body data-hoje="2026-09-29">
+<header class="topo">
+    <div class="topo-dentro">
+        <a class="prefeitura" href="index.html">
+            <span class="brasao" aria-hidden="true">VS</span>
+            <span><strong>Prefeitura de Vila Serena</strong><span>Ouvidoria e acesso à informação</span></span>
+        </a>
+        <nav aria-label="Principal"><a href="nova-manifestacao.html">Nova manifestação</a><a href="consulta.html" aria-current="page">Acompanhar protocolo</a><a href="relatorio.html">Relatórios</a><a href="login.html">Entrar</a></nav>
+        
+    </div>
+</header>
+<main class="estreito">
+    <h1>Acompanhar protocolo</h1>
+    <p>Use o protocolo e a chave de acesso recebidos ao registrar a manifestação. Não é preciso ter conta.</p>
+    <form class="bloco" onsubmit="event.preventDefault(); consultar()">
+        <div class="campo">
+            <label for="protocolo">Protocolo</label>
+            <input id="protocolo" type="text" value="2026-9999901-000004" inputmode="numeric" required>
+        </div>
+        <div class="campo">
+            <label for="chave">Chave de acesso</label>
+            <input id="chave" type="text" value="DEMO-000004" autocomplete="off" required>
+            <small>A chave não pode ser recuperada. Sem ela, só quem tem conta acompanha pelo login.</small>
+        </div>
+        <div class="aviso atencao oculto" id="erro" role="alert"><p>Protocolo ou chave de acesso inválidos. Confira os dois e tente de novo.</p></div>
+        <button class="botao" type="submit">Consultar</button>
+    </form>
+
+    <section id="resultado" class="oculto" aria-live="polite">
+        <div class="cabeca-manifestacao">
+            <span class="protocolo">2026-9999901-000004</span>
+            <span class="selo ok">Respondida</span>
+        </div>
+        <h2>Cronograma de obras do bairro</h2>
+        <p style="color:var(--tinta-2)">Pedido de informação, Secretaria de Obras e Urbanismo</p>
+        <div class="regua" data-abertura="2026-09-17" data-limite="2026-10-07" data-respondida="2026-09-25"></div>
+
+        <div class="bloco">
+            <h2>Resposta da prefeitura</h2>
+            <p><span class="selo atencao">Acesso parcialmente concedido</span></p>
+            <p>As obras do Jardim Sul começam em novembro, com conclusão prevista para março. O cronograma detalhado por rua ainda está em elaboração e será disponibilizado quando aprovado (Lei 12.527, art. 7º, § 3º).</p>
+            <div class="aviso">
+                <p><strong>Você pode recorrer até 05/10/2026 (seg).</strong> O recurso é julgado pela ouvidoria do município, autoridade superior à secretaria que respondeu (Lei 12.527, art. 15). Para recorrer, entre com a conta usada no pedido.</p>
+            </div>
+        </div>
+
+        <div class="bloco">
+            <h2>Histórico</h2>
+            <ol class="historico">
+                <li><strong>Pedido registrado</strong><span>17/09/2026</span></li>
+                <li><strong>Em análise pela ouvidoria</strong><span>18/09/2026</span></li>
+                <li><strong>Encaminhado à Secretaria de Obras e Urbanismo</strong><span>18/09/2026</span></li>
+                <li><strong>Resposta registrada pela SEMOB</strong><span>25/09/2026</span></li>
+            </ol>
+        </div>
+    </section>
+</main>
+<script src="regua.js"></script>
+<script>
+    function consultar() {
+        const ok = document.getElementById("chave").value.trim().toUpperCase() === "DEMO-000004";
+        document.getElementById("erro").classList.toggle("oculto", ok);
+        document.getElementById("resultado").classList.toggle("oculto", !ok);
+    }
+</script>
+</body>
+</html>

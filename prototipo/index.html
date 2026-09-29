@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<title>Protótipo Cidade Transparente</title>
+</head>
+<body data-hoje="2026-09-29">
+<header class="topo">
+    <div class="topo-dentro">
+        <a class="prefeitura" href="index.html">
+            <span class="brasao" aria-hidden="true">VS</span>
+            <span><strong>Prefeitura de Vila Serena</strong><span>Ouvidoria e acesso à informação</span></span>
+        </a>
+        <nav aria-label="Principal"><a href="nova-manifestacao.html">Nova manifestação</a><a href="consulta.html">Acompanhar protocolo</a><a href="relatorio.html">Relatórios</a><a href="login.html">Entrar</a></nav>
+        
+    </div>
+</header>
+<main class="estreito">
+    <h1>Protótipo navegável</h1>
+    <p>Telas estáticas para validar o desenho antes do frontend em React. Os dados são os do seed de demonstração (Vila Serena, hoje fixado em 29/09/2026) e as regras de prazo e de links seguem a API.</p>
+    <ul class="telas">
+        <li><a href="login.html"><strong>Entrar</strong><span>Login da equipe e do cidadão, com os caminhos sem conta.</span><em>todos</em></a></li>
+        <li><a href="nova-manifestacao.html"><strong>Nova manifestação</strong><span>Escolha do tipo, denúncia anônima e confirmação com protocolo e chave.</span><em>cidadão</em></a></li>
+        <li><a href="consulta.html"><strong>Acompanhar protocolo</strong><span>Consulta pública com protocolo e chave de acesso, sem login.</span><em>público</em></a></li>
+        <li><a href="painel.html"><strong>Painel do ouvidor</strong><span>Fila ordenada pelo prazo, com filtros e o que está perto de vencer.</span><em>ouvidor</em></a></li>
+        <li><a href="detalhe.html"><strong>Detalhe da manifestação</strong><span>Régua de prazo, histórico e botões que vêm dos links da API. Simula perfil e estado.</span><em>equipe e cidadão</em></a></li>
+        <li><a href="relatorio.html"><strong>Relatório de gestão</strong><span>Números do ano, estatística da LAI e a análise escrita pela ouvidoria.</span><em>público</em></a></li>
+    </ul>
+</main>
+</body>
+</html>

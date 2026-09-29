@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<title>Nova manifestação - Ouvidoria de Vila Serena</title>
+</head>
+<body data-hoje="2026-09-29">
+<header class="topo">
+    <div class="topo-dentro">
+        <a class="prefeitura" href="index.html">
+            <span class="brasao" aria-hidden="true">VS</span>
+            <span><strong>Prefeitura de Vila Serena</strong><span>Ouvidoria e acesso à informação</span></span>
+        </a>
+        <nav aria-label="Principal"><a href="nova-manifestacao.html">Nova manifestação</a><a href="consulta.html">Acompanhar protocolo</a><a href="relatorio.html">Relatórios</a><a href="login.html">Sair</a></nav>
+        <span class=quem>Maria Cidadã</span>
+    </div>
+</header>
+<main class="estreito">
+    <section id="formulario">
+        <h1>Nova manifestação</h1>
+        <p>Escolha o tipo. O prazo de resposta é contado em dias corridos e, se vencer num dia sem expediente, passa para o próximo dia útil.</p>
+        <form onsubmit="event.preventDefault(); registrar()">
+            <fieldset class="tipos">
+                <legend class="legenda" style="margin-bottom:0.6rem">O que você quer fazer?</legend>
+                <label class="tipo"><input type="radio" name="tipo" value="reclamacao" checked><strong>Reclamação</strong><em>resposta em até 30 dias</em><span>Um serviço público não funcionou como deveria.</span></label>
+                <label class="tipo"><input type="radio" name="tipo" value="denuncia"><strong>Denúncia</strong><em>resposta em até 30 dias</em><span>Uma irregularidade que precisa ser apurada. Pode ser anônima.</span></label>
+                <label class="tipo"><input type="radio" name="tipo" value="pedido"><strong>Pedido de informação</strong><em>resposta em até 20 dias</em><span>Acesso a documentos ou dados da prefeitura (Lei de Acesso à Informação). Cabe recurso se o acesso for negado.</span></label>
+                <label class="tipo"><input type="radio" name="tipo" value="sugestao"><strong>Sugestão</strong><em>resposta em até 30 dias</em><span>Uma ideia para melhorar um serviço.</span></label>
+                <label class="tipo"><input type="radio" name="tipo" value="elogio"><strong>Elogio</strong><em>resposta em até 30 dias</em><span>Reconhecer um bom atendimento.</span></label>
+            </fieldset>
+
+            <div class="aviso oculto" id="aviso-anonimo">
+                <p><label><input type="checkbox" id="anonima"> Enviar sem me identificar</label></p>
+                <p>Na denúncia anônima a prefeitura não sabe quem você é, e você acompanha só pelo protocolo e pela chave de acesso. Por exigência legal, o sistema guarda por 6 meses o endereço de rede do envio, entregue apenas por ordem judicial.</p>
+            </div>
+
+            <div class="campo">
+                <label for="assunto">Assunto</label>
+                <input id="assunto" type="text" maxlength="200" value="Lâmpada queimada na praça" required>
+            </div>
+            <div class="campo">
+                <label for="descricao">Descreva o que aconteceu</label>
+                <textarea id="descricao" maxlength="5000" required>A iluminação da Praça Central está apagada há uma semana.</textarea>
+                <small>Informe local, data e o que você observou. Evite dados de saúde ou de terceiros que não sejam necessários.</small>
+            </div>
+            <div class="campo">
+                <label for="anexo">Anexo (opcional)</label>
+                <input id="anexo" type="file" accept="application/pdf,image/png,image/jpeg">
+                <small>PDF, PNG ou JPEG, até 5 MB.</small>
+            </div>
+            <p style="font-size:0.9rem;color:var(--tinta-3)">Sua identificação fica visível apenas para a ouvidoria. A secretaria que responder recebe a manifestação sem o seu nome. <a href="#">Aviso de privacidade</a>.</p>
+            <button class="botao" type="submit">Registrar manifestação</button>
+        </form>
+    </section>
+
+    <section id="confirmacao" class="oculto" aria-live="polite">
+        <h1>Manifestação registrada</h1>
+        <div class="carimbo" id="carimbo">
+            <span>Protocolo</span>
+            <strong>2026-9999901-000012</strong>
+            <span>Recebida em 29/09/2026</span>
+        </div>
+        <h2>Chave de acesso</h2>
+        <div class="chave">
+            <code id="chave">K7QM-4XHT-9PWD</code>
+            <button class="botao secundario" type="button" onclick="navigator.clipboard?.writeText(document.getElementById('chave').textContent); this.textContent='Chave copiada'">Copiar chave</button>
+        </div>
+        <div class="aviso atencao">
+            <p>Guarde o protocolo e a chave agora. A chave aparece só nesta tela e não pode ser recuperada: a prefeitura guarda apenas uma versão cifrada dela.</p>
+        </div>
+        <p>Prazo de resposta: até <strong>29/10/2026 (qui)</strong>.</p>
+        <p><a class="botao" href="consulta.html">Acompanhar esta manifestação</a></p>
+    </section>
+</main>
+<script>
+    const tipos = document.querySelectorAll('input[name="tipo"]');
+    const avisoAnonimo = document.getElementById("aviso-anonimo");
+    const atualizar = () => avisoAnonimo.classList.toggle("oculto", document.querySelector('input[name="tipo"]:checked').value !== "denuncia");
+    tipos.forEach((t) => t.addEventListener("change", atualizar));
+    if (new URLSearchParams(location.search).get("tipo") === "denuncia") {
+        document.querySelector('input[value="denuncia"]').checked = true;
+        document.getElementById("anonima").checked = true;
+    }
+    atualizar();
+
+    function registrar() {
+        document.getElementById("formulario").classList.add("oculto");
+        document.getElementById("confirmacao").classList.remove("oculto");
+        document.getElementById("carimbo").classList.add("batido");
+        document.querySelector("#confirmacao h1").focus?.();
+    }
+</script>
+</body>
+</html>

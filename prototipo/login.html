@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<title>Entrar - Ouvidoria de Vila Serena</title>
+</head>
+<body data-hoje="2026-09-29">
+<header class="topo">
+    <div class="topo-dentro">
+        <a class="prefeitura" href="index.html">
+            <span class="brasao" aria-hidden="true">VS</span>
+            <span><strong>Prefeitura de Vila Serena</strong><span>Ouvidoria e acesso à informação</span></span>
+        </a>
+        <nav aria-label="Principal"><a href="nova-manifestacao.html">Nova manifestação</a><a href="consulta.html">Acompanhar protocolo</a><a href="relatorio.html">Relatórios</a><a href="login.html">Entrar</a></nav>
+        
+    </div>
+</header>
+<main class="estreito">
+    <h1>Entrar</h1>
+    <p>Com a conta você acompanha suas manifestações e pedidos de informação e pode recorrer de uma resposta.</p>
+    <form class="bloco" onsubmit="event.preventDefault(); location.href = 'painel.html'">
+        <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" autocomplete="username" value="ouvidor@demo.gov.br" required>
+        </div>
+        <div class="campo">
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" autocomplete="current-password" value="ouvidor123" required>
+        </div>
+        <div class="aviso atencao oculto" id="erro" role="alert"><p>E-mail ou senha inválidos. Confira os dados e tente de novo.</p></div>
+        <button class="botao" type="submit">Entrar</button>
+        <p style="margin-top:1rem"><a href="#">Criar conta de cidadão</a></p>
+    </form>
+    <h2>Sem conta</h2>
+    <p><a href="nova-manifestacao.html?tipo=denuncia">Fazer uma denúncia anônima</a>. Você acompanha pelo protocolo e pela chave de acesso, sem se identificar.</p>
+    <p><a href="consulta.html">Acompanhar um protocolo</a> que você já tem.</p>
+    <p><a href="#">Aviso de privacidade</a>: como a prefeitura trata seus dados e quem é o encarregado.</p>
+</main>
+</body>
+</html>

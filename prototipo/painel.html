@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<title>Manifestações - Ouvidoria de Vila Serena</title>
+</head>
+<body data-hoje="2026-09-29">
+<header class="topo">
+    <div class="topo-dentro">
+        <a class="prefeitura" href="index.html">
+            <span class="brasao" aria-hidden="true">VS</span>
+            <span><strong>Prefeitura de Vila Serena</strong><span>Ouvidoria e acesso à informação</span></span>
+        </a>
+        <nav aria-label="Principal"><a href="painel.html" aria-current="page">Manifestações</a><a href="relatorio.html">Relatório de gestão</a></nav>
+        <span class="quem">Ouvidora Vila Serena</span>
+        
+    </div>
+</header>
+<main>
+    <h1>Manifestações</h1>
+    <p>Ordenadas pelo prazo: o que vence primeiro aparece no topo.</p>
+    <div class="filtros" role="group" aria-label="Filtros">
+        <button class="filtro" type="button" data-filtro="aguardando" aria-pressed="true">Aguardando resposta</button>
+        <button class="filtro" type="button" data-filtro="semana" aria-pressed="false">Vencem em 7 dias</button>
+        <button class="filtro" type="button" data-filtro="finalizadas" aria-pressed="false">Respondidas e encerradas</button>
+        <select aria-label="Tipo" id="tipo">
+            <option value="">Todos os tipos</option>
+            <option>Reclamação</option><option>Denúncia</option><option>Pedido de informação</option><option>Sugestão</option><option>Elogio</option>
+        </select>
+        <select aria-label="Secretaria" id="secretaria">
+            <option value="">Todas as secretarias</option>
+            <option>SEMOB</option><option>SEMSA</option><option>SEMED</option><option value="-">Sem secretaria</option>
+        </select>
+    </div>
+    <table class="fila">
+        <thead><tr><th>Manifestação</th><th>Tipo</th><th>Secretaria</th><th>Situação</th><th>Prazo</th></tr></thead>
+        <tbody>
+            <tr data-grupo="aguardando" data-tipo="Reclamação" data-secretaria="SEMSA" data-limite="2026-09-25">
+                <td><a href="detalhe.html">Falta de medicamento na UBS Centro</a><span class="protocolo">2026-9999901-000006</span></td>
+                <td>Reclamação</td><td>SEMSA</td><td><span class="selo">Encaminhada</span></td>
+                <td class="prazo"><div class="mini-regua" data-abertura="2026-08-26" data-limite="2026-09-25"></div><small></small></td>
+            </tr>
+            <tr data-grupo="aguardando" data-tipo="Pedido de informação" data-secretaria="SEMED" data-limite="2026-10-05">
+                <td><a href="detalhe.html">Vagas na creche municipal</a><span class="protocolo">2026-9999901-000007</span></td>
+                <td>Pedido de informação</td><td>SEMED</td><td><span class="selo">Encaminhada</span></td>
+                <td class="prazo"><div class="mini-regua" data-abertura="2026-09-14" data-limite="2026-10-05"></div><small></small></td>
+            </tr>
+            <tr data-grupo="aguardando" data-tipo="Pedido de informação" data-secretaria="SEMOB" data-limite="2026-10-13">
+                <td><a href="detalhe.html">Contratos de pavimentação 2026</a><span class="protocolo">2026-9999901-000003, prazo prorrogado</span></td>
+                <td>Pedido de informação</td><td>SEMOB</td><td><span class="selo">Encaminhada</span></td>
+                <td class="prazo"><div class="mini-regua" data-abertura="2026-09-11" data-limite="2026-10-13"></div><small></small></td>
+            </tr>
+            <tr data-grupo="aguardando" data-tipo="Denúncia" data-secretaria="-" data-limite="2026-10-26">
+                <td><a href="detalhe.html">Descarte irregular de entulho</a><span class="protocolo">2026-9999901-000002, anônima</span></td>
+                <td>Denúncia</td><td>—</td><td><span class="selo">Em análise</span></td>
+                <td class="prazo"><div class="mini-regua" data-abertura="2026-09-24" data-limite="2026-10-26"></div><small></small></td>
+            </tr>
+            <tr data-grupo="aguardando" data-tipo="Reclamação" data-secretaria="-" data-limite="2026-10-27">
+                <td><a href="detalhe.html">Buraco na Rua das Palmeiras</a><span class="protocolo">2026-9999901-000001</span></td>
+                <td>Reclamação</td><td>—</td><td><span class="selo">Recebida</span></td>
+                <td class="prazo"><div class="mini-regua" data-abertura="2026-09-27" data-limite="2026-10-27"></div><small></small></td>
+            </tr>
+            <tr data-grupo="finalizadas" data-tipo="Pedido de informação" data-secretaria="SEMOB" data-limite="2026-10-07">
+                <td><a href="detalhe.html">Cronograma de obras do bairro</a><span class="protocolo">2026-9999901-000004</span></td>
+                <td>Pedido de informação</td><td>SEMOB</td><td><span class="selo ok">Respondida</span></td>
+                <td class="prazo"><small class="selo ok">Respondida no prazo</small></td>
+            </tr>
+            <tr data-grupo="finalizadas" data-tipo="Elogio" data-secretaria="SEMOB" data-limite="2026-09-04">
+                <td><a href="detalhe.html">Recapeamento da Av. Brasil</a><span class="protocolo">2026-9999901-000005</span></td>
+                <td>Elogio</td><td>SEMOB</td><td><span class="selo">Encerrada</span></td>
+                <td class="prazo"><small class="selo ok">Respondida no prazo</small></td>
+            </tr>
+        </tbody>
+    </table>
+    <p id="vazio" class="oculto">Nenhuma manifestação com esses filtros. Remova um filtro para ver mais resultados.</p>
+</main>
+<script src="regua.js"></script>
+<script>
+    // No React, cada filtro vira parâmetro de GET /manifestacoes (status, tipoId, secretariaId, vencimentoAte)
+    // regua.js já define hoje(); aqui é a data fixa do protótipo como Date
+    const dataHoje = hoje();
+    let grupo = "aguardando";
+    function aplicar() {
+        const tipo = document.getElementById("tipo").value;
+        const secretaria = document.getElementById("secretaria").value;
+        let visiveis = 0;
+        document.querySelectorAll(".fila tbody tr").forEach((tr) => {
+            const faltam = (new Date(tr.dataset.limite + "T12:00:00") - dataHoje) / 86400000;
+            const noGrupo = grupo === "semana" ? tr.dataset.grupo === "aguardando" && faltam <= 7 : tr.dataset.grupo === grupo;
+            const ok = noGrupo && (!tipo || tr.dataset.tipo === tipo) && (!secretaria || tr.dataset.secretaria === secretaria);
+            tr.classList.toggle("oculto", !ok);
+            visiveis += ok;
+        });
+        document.getElementById("vazio").classList.toggle("oculto", visiveis > 0);
+    }
+    document.querySelectorAll(".filtro").forEach((b) => b.addEventListener("click", () => {
+        document.querySelectorAll(".filtro").forEach((x) => x.setAttribute("aria-pressed", x === b));
+        grupo = b.dataset.filtro;
+        aplicar();
+    }));
+    document.querySelectorAll(".filtros select").forEach((s) => s.addEventListener("change", aplicar));
+    aplicar();
+</script>
+</body>
+</html>

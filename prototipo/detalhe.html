@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<title>Contratos de pavimentação 2026 - Ouvidoria de Vila Serena</title>
+</head>
+<body data-hoje="2026-09-29">
+<header class="topo">
+    <div class="topo-dentro">
+        <a class="prefeitura" href="index.html">
+            <span class="brasao" aria-hidden="true">VS</span>
+            <span><strong>Prefeitura de Vila Serena</strong><span>Ouvidoria e acesso à informação</span></span>
+        </a>
+        <nav aria-label="Principal"><a href="painel.html" aria-current="page">Manifestações</a><a href="relatorio.html">Relatório de gestão</a></nav>
+        <span class="quem">Ouvidora Vila Serena</span>
+        
+    </div>
+</header>
+<main>
+    <form class="simulador" aria-label="Simulação do protótipo">
+        <span>Simular:</span>
+        <label>Perfil
+            <select id="perfil">
+                <option value="OUVIDOR">Ouvidora</option>
+                <option value="SERVIDOR">Servidor da SEMOB</option>
+                <option value="CIDADAO">Cidadã que fez o pedido</option>
+            </select>
+        </label>
+        <label>Estado
+            <select id="estado">
+                <option>RECEBIDA</option><option>EM_ANALISE</option><option selected>ENCAMINHADA</option>
+                <option>RESPONDIDA</option><option>EM_RECURSO</option><option>ENCERRADA</option>
+            </select>
+        </label>
+        <span>Os botões à direita saem dos links da resposta da API.</span>
+    </form>
+
+    <div id="sem-acesso" class="oculto">
+        <h1>Manifestação não encontrada</h1>
+        <p>A secretaria só vê a manifestação depois que a ouvidoria a encaminha. Até lá, a API responde 404 para o servidor.</p>
+    </div>
+
+    <div id="conteudo">
+        <div class="cabeca-manifestacao">
+            <span class="protocolo">2026-9999901-000003</span>
+            <span class="selo" id="selo-estado">Encaminhada</span>
+        </div>
+        <h1>Contratos de pavimentação 2026</h1>
+
+        <div class="detalhe">
+            <div>
+                <div id="bloco-prazo">
+                    <div class="regua" data-abertura="2026-09-11" data-limite="2026-10-13" data-limite-original="2026-10-01"></div>
+                </div>
+
+                <section class="bloco">
+                    <h2>Pedido</h2>
+                    <dl class="dados">
+                        <dt>Tipo</dt><dd>Pedido de informação (Lei de Acesso à Informação)</dd>
+                        <dt>Secretaria</dt><dd id="secretaria">Secretaria de Obras e Urbanismo</dd>
+                        <dt>Aberto em</dt><dd>11/09/2026</dd>
+                    </dl>
+                    <p style="margin-top:1rem">Solicito cópia dos contratos de pavimentação firmados em 2026.</p>
+                </section>
+
+                <section class="bloco restrito" id="identidade">
+                    <h2>Quem fez o pedido</h2>
+                    <dl class="dados">
+                        <dt>Nome</dt><dd>Maria Cidadã</dd>
+                        <dt>E-mail</dt><dd>cidadao@demo.gov.br</dd>
+                        <dt>Telefone</dt><dd>(41) 99999-0000</dd>
+                    </dl>
+                    <small id="nota-identidade">Identificação visível só para a ouvidoria (Lei 13.460, art. 10, § 7º). Este acesso fica registrado na auditoria.</small>
+                </section>
+                <section class="bloco oculto" id="identidade-restrita">
+                    <h2>Quem fez o pedido</h2>
+                    <p>Identificação restrita à ouvidoria (Lei 13.460, art. 10, § 7º). A secretaria responde sem saber quem perguntou.</p>
+                </section>
+
+                <section class="bloco oculto" id="bloco-resposta">
+                    <h2>Resposta da SEMOB</h2>
+                    <p><span class="selo vencido">Acesso negado</span></p>
+                    <p>Os contratos contêm dados pessoais de fornecedores pessoas físicas e não podem ser fornecidos integralmente.</p>
+                    <div class="aviso" id="orientacao-recurso"><p><strong>Cabe recurso até 09/10/2026 (sex)</strong>, dirigido à ouvidoria do município (Lei 12.527, art. 15).</p></div>
+                </section>
+
+                <section class="bloco">
+                    <h2>Histórico</h2>
+                    <ol class="historico" id="historico"></ol>
+                </section>
+            </div>
+
+            <aside class="acoes" aria-label="Ações disponíveis">
+                <h2>O que fazer agora</h2>
+                <div id="acoes"></div>
+                <details class="api">
+                    <summary>Ver os links da resposta da API</summary>
+                    <pre id="links"></pre>
+                </details>
+            </aside>
+        </div>
+    </div>
+</main>
+<script src="regua.js"></script>
+<script>
+    // Espelho da regra de FluxoManifestacao só para o protótipo. No React, os botões virão direto de _links:
+    // o frontend não decide nada, só mostra o que a API oferece.
+    const ETAPAS = [
+        ["RECEBIDA", "Pedido registrado", "11/09/2026", "Manifestante"],
+        ["EM_ANALISE", "Em análise pela ouvidoria", "12/09/2026", "Ouvidora Vila Serena (OUVIDOR)"],
+        ["ENCAMINHADA", "Encaminhado à Secretaria de Obras e Urbanismo", "13/09/2026", "Ouvidora Vila Serena (OUVIDOR)"],
+        ["PRORROGACAO", "Prazo prorrogado por 10 dias, até 13/10/2026. Justificativa: volume de contratos exige levantamento no arquivo.", "26/09/2026", "Ouvidora Vila Serena (OUVIDOR)"],
+        ["RESPONDIDA", "Resposta registrada pela SEMOB: acesso negado", "30/09/2026", "Servidor de Obras (SERVIDOR)"],
+        ["EM_RECURSO", "Recurso interposto pelo requerente; julgamento até 06/10/2026", "01/10/2026", "Manifestante"],
+        ["ENCERRADA", "Recurso indeferido. Manifestação encerrada", "03/10/2026", "Ouvidora Vila Serena (OUVIDOR)"],
+    ];
+    const ORDEM = ["RECEBIDA", "EM_ANALISE", "ENCAMINHADA", "RESPONDIDA", "EM_RECURSO", "ENCERRADA"];
+    const NOMES = { RECEBIDA: "Recebida", EM_ANALISE: "Em análise", ENCAMINHADA: "Encaminhada", RESPONDIDA: "Respondida", EM_RECURSO: "Em recurso", ENCERRADA: "Encerrada" };
+
+    const ACOES = {
+        analise: { texto: "Iniciar análise", campo: null },
+        encaminhamento: { texto: "Encaminhar a uma secretaria", campo: '<select aria-label="Secretaria"><option>Secretaria de Saúde</option><option>Secretaria de Educação</option></select>' },
+        prorrogacao: { texto: "Prorrogar prazo", campo: '<textarea aria-label="Justificativa" placeholder="Justificativa (obrigatória, fica visível ao requerente)"></textarea>' },
+        arquivamento: { texto: "Arquivar", campo: '<textarea aria-label="Justificativa" placeholder="Justificativa do arquivamento"></textarea>', perigo: true },
+        resposta: { texto: "Responder", campo: '<select aria-label="Resultado"><option>Acesso concedido</option><option>Acesso parcialmente concedido</option><option>Acesso negado</option><option>Informação inexistente</option></select><textarea aria-label="Resposta" placeholder="Resposta ao requerente"></textarea>' },
+        recurso: { texto: "Recorrer da resposta", campo: '<textarea aria-label="Justificativa" placeholder="Por que a resposta deve ser revista?"></textarea>' },
+        julgamento: { texto: "Julgar recurso", campo: '<select aria-label="Decisão"><option>Deferir: nova resposta até</option><option>Indeferir</option></select><input type="date" aria-label="Prazo para a nova resposta" value="2026-10-08"><textarea aria-label="Decisão" placeholder="Fundamentação da decisão"></textarea>' },
+        encerramento: { texto: "Encerrar", campo: null },
+        anexar: { texto: "Anexar documento", campo: '<input type="file" aria-label="Arquivo" accept="application/pdf,image/png,image/jpeg">' },
+    };
+
+    function linksDisponiveis(perfil, estado) {
+        const ouvidor = perfil === "OUVIDOR", servidor = perfil === "SERVIDOR", dono = perfil === "CIDADAO";
+        const final = estado === "ENCERRADA";
+        const rels = [];
+        // Neste exemplo a prorrogação acontece em ENCAMINHADA; antes dela o link ainda aparece
+        if (ouvidor && estado === "RECEBIDA") rels.push("analise", "prorrogacao", "arquivamento");
+        if (ouvidor && estado === "EM_ANALISE") rels.push("encaminhamento", "prorrogacao", "arquivamento");
+        if (ouvidor && estado === "ENCAMINHADA") rels.push("encaminhamento");
+        if (servidor && estado === "ENCAMINHADA") rels.push("resposta");
+        if (dono && estado === "RESPONDIDA") rels.push("recurso");
+        if (ouvidor && estado === "EM_RECURSO") rels.push("julgamento");
+        if (!final && (ouvidor || dono || (servidor && ORDEM.indexOf(estado) >= 2))) rels.push("anexar");
+        return rels;
+    }
+
+    function render() {
+        const perfil = document.getElementById("perfil").value;
+        const estado = document.getElementById("estado").value;
+        const indice = ORDEM.indexOf(estado);
+        const semAcesso = perfil === "SERVIDOR" && indice < 2;
+        document.getElementById("sem-acesso").classList.toggle("oculto", !semAcesso);
+        document.getElementById("conteudo").classList.toggle("oculto", semAcesso);
+        if (semAcesso) return;
+
+        const selo = document.getElementById("selo-estado");
+        selo.textContent = NOMES[estado];
+        selo.className = "selo" + (estado === "RESPONDIDA" ? " ok" : "");
+        document.getElementById("secretaria").textContent = indice >= 2 ? "Secretaria de Obras e Urbanismo" : "Ainda não encaminhado";
+        document.getElementById("bloco-prazo").classList.toggle("oculto", indice > 2);
+        document.getElementById("bloco-resposta").classList.toggle("oculto", indice < 3);
+        document.getElementById("orientacao-recurso").classList.toggle("oculto", estado !== "RESPONDIDA");
+        const podeVer = perfil !== "SERVIDOR";
+        document.getElementById("identidade").classList.toggle("oculto", !podeVer);
+        document.getElementById("identidade-restrita").classList.toggle("oculto", podeVer);
+        document.getElementById("nota-identidade").textContent = perfil === "OUVIDOR"
+            ? "Identificação visível só para a ouvidoria (Lei 13.460, art. 10, § 7º). Este acesso fica registrado na auditoria."
+            : "Seus dados ficam visíveis só para você e para a ouvidoria.";
+
+        const etapas = ETAPAS.filter(([e]) => e === "PRORROGACAO" ? indice >= 2 : ORDEM.indexOf(e) <= indice);
+        document.getElementById("historico").innerHTML = etapas.map(([, texto, dia, quem]) =>
+            `<li><strong>${texto}</strong><span>${dia}${perfil === "CIDADAO" && quem !== "Manifestante" ? "" : ", " + quem}</span></li>`).join("");
+
+        const rels = linksDisponiveis(perfil, estado);
+        const acoes = document.getElementById("acoes");
+        acoes.innerHTML = rels.length === 0
+            ? '<p class="sem-acoes">Nenhuma ação disponível. ' + (estado === "ENCERRADA" ? "Manifestação encerrada: só consulta." : estado === "RESPONDIDA" && perfil === "OUVIDOR" ? "O encerramento fica liberado depois do prazo de recurso do requerente (09/10)." : "") + "</p>"
+            : rels.map((r) => {
+                const a = ACOES[r];
+                const form = a.campo ? `<form>${a.campo}<button class="botao" type="button" style="margin-top:.5rem">Confirmar</button></form>` : "";
+                return `<button class="botao${a.perigo ? " perigo" : r === "anexar" ? " secundario" : ""}" type="button" data-rel="${r}">${a.texto}</button>${form}`;
+            }).join("");
+        acoes.querySelectorAll("button[data-rel]").forEach((b) => b.addEventListener("click", () => {
+            const f = b.nextElementSibling;
+            if (f && f.tagName === "FORM") f.classList.toggle("aberto");
+        }));
+
+        const links = { self: { href: "/api/v1/manifestacoes/3" }, tramites: { href: "/api/v1/manifestacoes/3/tramites" } };
+        rels.forEach((r) => links[r] = { href: r === "recurso" ? "/api/v1/respostas/5/recursos" : r === "julgamento" ? "/api/v1/recursos/2" : `/api/v1/manifestacoes/3/${r === "anexar" ? "anexos" : r === "resposta" ? "respostas" : r}` });
+        document.getElementById("links").textContent = JSON.stringify({ status: estado, _links: links }, null, 2);
+    }
+    document.querySelectorAll("#perfil, #estado").forEach((s) => s.addEventListener("change", render));
+    render();
+</script>
+</body>
+</html>
