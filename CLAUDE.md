@@ -49,6 +49,14 @@ A documentação completa do domínio, entidades, regras de negócio e endpoints
 - Autorização por perfil com `@PreAuthorize`, perfis: `ADMIN_PLATAFORMA`, `ADMIN`, `OUVIDOR`, `SERVIDOR`, `CIDADAO`.
 - `ADMIN_PLATAFORMA` não tem município: só acessa `/municipios` e cria o primeiro ADMIN de cada município. Nenhuma rota com dados de município o inclui no `@PreAuthorize`, e ler `municipioId` de um token sem esse claim lança exceção (o filtro falha fechado, nunca vira "sem filtro").
 
+## LGPD e conformidade legal
+
+- Lei e LGPD vêm antes de conveniência: o sistema deve ser fiel ao que uma prefeitura real precisaria. Toda decisão sobre dado pessoal cita o artigo que a fundamenta. Inventário de dados, bases legais e regras em `docs/lgpd.md` — leia antes de mexer em dado pessoal, rota pública ou retenção.
+- Prefeitura é a controladora; a plataforma é operadora (LGPD art. 39): `ADMIN_PLATAFORMA` nunca acessa dado de cidadão.
+- Identidade de quem se manifesta é informação restrita (Lei 13.460 art. 10 § 7º): visível só para o OUVIDOR e para o próprio cidadão, nunca para SERVIDOR nem em rota pública.
+- Rota pública nunca expõe dado pessoal. Identificador sequencial (protocolo) não serve como credencial.
+- Registros da administração não se apagam (Lei 8.159 art. 9º; LGPD art. 16, I): DELETE desativa/encerra, e a resposta explica a base legal da conservação.
+
 ## Testes
 
 - Toda rota nova precisa de request correspondente na coleção Postman (`postman/CidadeTransparente.postman_collection.json`), incluindo casos de erro relevantes (401/403/404/409).

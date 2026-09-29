@@ -63,7 +63,7 @@ Variáveis de ambiente (ou `backend/src/main/resources/application.yml`):
 | `DB_USER` | Usuário do banco | `postgres` |
 | `DB_PASSWORD` | Senha do banco | `postgres` |
 | `JWT_SECRET` | Chave usada para assinar o token (HS256, **mínimo 32 caracteres**; a aplicação não sobe sem ela) | (definir localmente, nunca commitar) |
-| `JWT_EXPIRATION` | Validade do token, em milissegundos | `86400000` (24h) |
+| `JWT_EXPIRATION` | Validade do token, em milissegundos | `7200000` (2h) |
 
 ## Usuários de demonstração
 
@@ -86,6 +86,7 @@ O seed cria dois municípios fictícios (Vila Serena e Campo Aurora) para demons
 ```
 cidade-transparente/
 ├── docs/documentacao-previa.md   # domínio, entidades, regras, endpoints
+├── docs/lgpd.md                 # conformidade com LGPD, LAI e Lei 13.460
 ├── postman/                      # coleção de testes
 ├── backend/                      # API Spring Boot
 └── frontend/                     # app Flutter Web

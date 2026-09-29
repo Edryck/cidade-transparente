@@ -98,6 +98,8 @@ Desvios: `EM_RECURSO` (depois de respondida, só LAI), `ARQUIVADA` (a partir de 
 
 ## 6. Segurança (JWT)
 
+Conformidade com LGPD, LAI e Lei 13.460 (papéis, bases legais, inventário de dados, direitos do titular, retenção e riscos) está em [`lgpd.md`](lgpd.md).
+
 - `POST /api/v1/auth/login` devolve o access token (expira em poucas horas)
 - Claims: `sub` (usuário), `roles`, `municipioId`
 - Filtro do Spring Security valida o token em toda rota, exceto as públicas
@@ -121,7 +123,8 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Auth | `POST /auth/login`, `POST /auth/registro-cidadao` |
 | Municípios | `GET/POST /municipios`, `GET/PUT /municipios/{id}` (ADMIN_PLATAFORMA). O POST cria junto o primeiro ADMIN; o código IBGE não muda depois |
 | Secretarias | CRUD `/secretarias` (leitura também para OUVIDOR). DELETE desativa, não apaga |
-| Usuários | CRUD `/usuarios` (ADMIN, só perfis ADMIN/OUVIDOR/SERVIDOR; filtro `?perfil=`). DELETE desativa, não apaga |
+| Usuários | CRUD `/usuarios` (ADMIN, só a equipe: ADMIN/OUVIDOR/SERVIDOR; filtro `?perfil=`). Conta de cidadão é invisível para o ADMIN (404). DELETE desativa, não apaga |
+| Privacidade (LGPD) | `GET /municipios/{id}/privacidade` (público), `PUT /municipios/{id}/encarregado` (ADMIN), `GET/PUT/DELETE /minha-conta` (direitos do titular). Ver `docs/lgpd.md` |
 | Tipos e prazos | `GET /tipos-manifestacao`, `GET /tipos-manifestacao/{id}`, `PUT/DELETE /tipos-manifestacao/{id}/prazo` (regra municipal; DELETE volta à federal) |
 | Manifestações | `POST /manifestacoes`, `GET /manifestacoes` (filtros + paginação), `GET /manifestacoes/{id}` |
 | Ações | `POST /manifestacoes/{id}/analise`, `/encaminhamento`, `/prorrogacao`, `/arquivamento`, `/encerramento` |
@@ -129,7 +132,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Trâmites | `GET /manifestacoes/{id}/tramites` |
 | Respostas | `POST /manifestacoes/{id}/respostas` |
 | Recursos | `POST /respostas/{id}/recursos`, `PUT /recursos/{id}` (julgar) |
-| Público | `GET /protocolos/{numero}`, `GET /municipios/ativos` (só id, nome e UF, para o cidadão escolher onde se registrar) |
+| Público | `GET /protocolos/{numero}` (exige a chave de acesso entregue na abertura: protocolo sequencial não é credencial), `GET /municipios/ativos`, `GET /municipios/{id}/privacidade` |
 | Relatórios | `GET /relatorios/gestao?ano=` (total por tipo, por secretaria, % no prazo) |
 
 **Detalhe de projeto:** as ações são substantivos (`/prorrogacao`), não verbos (`/prorrogar`). Isso é o tipo de coisa que dá pra defender no vídeo de Richardson.
