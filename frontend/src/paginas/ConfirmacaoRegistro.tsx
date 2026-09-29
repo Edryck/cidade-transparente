@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { CircleCheck } from 'lucide-react'
 import { Alerta } from '../componentes/Alerta'
+import { CabecalhoPagina } from '../componentes/CabecalhoPagina'
 import { Comprovante } from '../componentes/Comprovante'
 import { EstadoVazio } from '../componentes/Estados'
 import { comprovanteTemporario } from '../contextos/comprovante'
@@ -19,7 +21,7 @@ export default function ConfirmacaoRegistro() {
   if (!comprovante) {
     return (
       <>
-        <h1>Comprovante indisponível</h1>
+        <CabecalhoPagina titulo="Comprovante indisponível" />
         <EstadoVazio titulo="O comprovante não está mais nesta tela">
           <p>
             Por segurança, a chave de acesso aparece uma única vez e não fica guardada no navegador. Se você anotou o
@@ -36,8 +38,11 @@ export default function ConfirmacaoRegistro() {
   const url = `${window.location.origin}/acompanhar?protocolo=${encodeURIComponent(comprovante.protocolo)}`
   return (
     <>
-      <h1>Manifestação registrada</h1>
-      <p>Sua manifestação foi registrada. Guarde este protocolo e a chave de acesso{cidadao ? ': mesmo com a conta, eles são o seu comprovante' : ''}.</p>
+      <div className="registro-concluido">
+        <CircleCheck aria-hidden size={28} strokeWidth={2} />
+        <CabecalhoPagina titulo="Manifestação registrada"
+          descricao={<>Seu registro foi realizado. Guarde o protocolo e a chave de acesso{cidadao ? ': mesmo com a conta, eles são o seu comprovante' : ''}.</>} />
+      </div>
       {comprovante.anexos && comprovante.anexos.length > 0 && (falhas.length === 0
         ? <Alerta tipo="sucesso"><p>{comprovante.anexos.length === 1 ? 'Anexo enviado' : `${comprovante.anexos.length} anexos enviados`}: {comprovante.anexos.map((a) => a.nome).join(', ')}.</p></Alerta>
         : <Alerta tipo="atencao" titulo="Alguns anexos não foram enviados">

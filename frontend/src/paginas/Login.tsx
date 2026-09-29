@@ -5,6 +5,7 @@ import { FalhaApi } from '../api/cliente'
 import { municipiosApi } from '../api/municipios'
 import { Alerta } from '../componentes/Alerta'
 import { Botao } from '../componentes/Botao'
+import { CabecalhoPagina } from '../componentes/CabecalhoPagina'
 import { CampoFormulario } from '../componentes/CampoFormulario'
 import { useMunicipio } from '../contextos/MunicipioContext'
 import { iniciarSessao, ROTA_INICIAL } from '../contextos/sessao'
@@ -13,12 +14,12 @@ import { EMAIL } from '../util/validacao'
 
 // Mensagens fixas para 401 e 403: não revelam se o e-mail existe
 const MENSAGENS: Record<number, string> = {
-  401: 'E-mail ou senha inválidos',
-  403: 'Usuário ou município desativado',
+  401: 'E-mail ou senha inválidos.',
+  403: 'Usuário ou município desativado.',
 }
 
 export default function Login() {
-  useTitulo('Entrar')
+  useTitulo('Acesse sua conta')
   const navegar = useNavigate()
   const [parametros] = useSearchParams()
   const { municipio, escolher } = useMunicipio()
@@ -64,27 +65,22 @@ export default function Login() {
   }
 
   return (
-    <>
-      <h1>Entrar</h1>
-      {parametros.get('registrar') ? (
+    <div className="coluna-estreita">
+      <CabecalhoPagina titulo="Acesse sua conta" descricao="Entre para registrar e acompanhar suas manifestações."
+        trilha={[{ texto: 'Início', para: '/' }, { texto: 'Acesse sua conta' }]} />
+
+      {parametros.get('registrar') && (
         <Alerta tipo="info">
           <p>
-            Para registrar reclamação, sugestão, elogio ou pedido de informação, entre com sua conta ou crie uma: a
-            lei exige identificação nesses casos (Lei 13.460, art. 10). Denúncias podem ser feitas{' '}
-            <Link to="/denuncia-anonima">sem identificação</Link>.
+            Reclamação, sugestão, elogio e pedido de informação exigem identificação (Lei 13.460, art. 10). Denúncias
+            podem ser feitas <Link to="/denuncia-anonima">sem conta</Link>.
           </p>
         </Alerta>
-      ) : (
-        <p>Com a conta, você acompanha suas manifestações e pode recorrer de uma resposta.</p>
       )}
 
-      <form onSubmit={entrar} noValidate className="formulario">
+      <form onSubmit={entrar} noValidate className="formulario superficie">
         {falha && (
-          <div ref={refFalha} tabIndex={-1}>
-            <Alerta tipo="erro">
-              <p>{falha}</p>
-            </Alerta>
-          </div>
+          <div ref={refFalha} tabIndex={-1}><Alerta tipo="erro"><p>{falha}</p></Alerta></div>
         )}
         <CampoFormulario id="email" rotulo="E-mail" obrigatorio erro={erros.email}>
           {(p) => <input {...p} type="email" autoComplete="username" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} />}
@@ -92,17 +88,18 @@ export default function Login() {
         <CampoFormulario id="senha" rotulo="Senha" obrigatorio erro={erros.senha}>
           {(p) => <input {...p} type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />}
         </CampoFormulario>
-        <Botao type="submit" enviando={enviando} textoEnviando="Entrando…">Entrar</Botao>
+        <Botao type="submit" enviando={enviando} textoEnviando="Entrando…" className="botao-bloco">Entrar</Botao>
+        <p style={{ margin: 0 }}>Ainda não tem conta? <Link to="/cadastro">Criar conta</Link></p>
       </form>
 
-      <nav aria-label="Outras opções" className="secao">
+      <nav aria-labelledby="sem-conta" className="links-auxiliares">
+        <h2 id="sem-conta">Sem conta você também pode</h2>
         <ul className="lista-links">
-          <li><Link to="/cadastro">Criar conta</Link></li>
-          <li><Link to="/denuncia-anonima">Denúncia anônima</Link></li>
+          <li><Link to="/denuncia-anonima">Registrar denúncia anônima</Link></li>
           <li><Link to="/acompanhar">Acompanhar protocolo</Link></li>
-          <li><Link to="/privacidade">Aviso de privacidade</Link></li>
+          <li><Link to="/privacidade">Ler o aviso de privacidade</Link></li>
         </ul>
       </nav>
-    </>
+    </div>
   )
 }

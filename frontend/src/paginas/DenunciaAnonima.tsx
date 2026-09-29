@@ -4,6 +4,7 @@ import { FalhaApi } from '../api/cliente'
 import { manifestacoesApi } from '../api/manifestacoes'
 import { Alerta } from '../componentes/Alerta'
 import { Botao } from '../componentes/Botao'
+import { CabecalhoPagina } from '../componentes/CabecalhoPagina'
 import { CampoFormulario } from '../componentes/CampoFormulario'
 import { comprovanteTemporario } from '../contextos/comprovante'
 import { useMunicipio } from '../contextos/MunicipioContext'
@@ -84,26 +85,25 @@ export default function DenunciaAnonima() {
 
   return (
     <>
-      <h1>Denúncia anônima</h1>
-      <p>Informe uma irregularidade para a prefeitura apurar, sem se identificar.</p>
+      <CabecalhoPagina titulo="Registrar denúncia anônima" descricao="Você pode registrar uma denúncia sem criar uma conta."
+        trilha={[{ texto: 'Início', para: '/' }, { texto: 'Denúncia anônima' }]} />
 
-      <Alerta tipo="sigilo" titulo="Sobre o anonimato">
+      <Alerta tipo="sigilo" titulo="Sua identidade não é registrada">
         <p>
           A prefeitura não saberá quem você é. Por lei, o endereço de rede do envio fica guardado por 6 meses e só é
           entregue com ordem judicial (Marco Civil, art. 15).
         </p>
       </Alerta>
 
-      <form onSubmit={enviar} noValidate className="formulario">
+      <form onSubmit={enviar} noValidate className="formulario superficie">
         {falha && (
           <div ref={refFalha} tabIndex={-1}><Alerta tipo="erro"><p>{falha}</p></Alerta></div>
         )}
-
         <dl className="dados dados-formulario">
           <dt>Município</dt>
-          <dd>{municipio?.nome} ({municipio?.uf}) <Link to="/municipios?voltar=/denuncia-anonima">Trocar</Link></dd>
+          <dd>Prefeitura de {municipio?.nome} ({municipio?.uf}) <Link to="/municipios?voltar=/denuncia-anonima">Trocar</Link></dd>
           <dt>Tipo</dt>
-          <dd>Denúncia. Para outros tipos, <Link to="/login?registrar=1">entre com sua conta</Link>.</dd>
+          <dd>Denúncia</dd>
         </dl>
 
         <CampoFormulario id="assunto" rotulo="Assunto" obrigatorio erro={erros.assunto}
@@ -112,8 +112,8 @@ export default function DenunciaAnonima() {
             onChange={(e) => setCampos((c) => ({ ...c, assunto: e.target.value }))} />}
         </CampoFormulario>
 
-        <CampoFormulario id="descricao" rotulo="Descrição" obrigatorio erro={erros.descricao}
-          ajuda="Descreva o que aconteceu: onde, quando e o que você viu. Evite dados de outras pessoas que não sejam necessários para apurar.">
+        <CampoFormulario id="descricao" rotulo="Descreva o que aconteceu" obrigatorio erro={erros.descricao}
+          ajuda="Onde, quando e o que você viu. Evite dados de outras pessoas que não sejam necessários para apurar.">
           {(p) => (
             <>
               <textarea {...p} rows={8} maxLength={LIMITE_DESCRICAO} value={campos.descricao}
@@ -125,21 +125,20 @@ export default function DenunciaAnonima() {
           )}
         </CampoFormulario>
 
-        <p className="metadado">
-          O texto fica salvo neste navegador até o envio. Denúncia anônima não aceita anexos: o envio de arquivos exige conta.
+        <p className="metadado" style={{ margin: 0 }}>
+          O texto fica salvo neste navegador até o envio. A denúncia anônima não aceita anexos: o envio de arquivos exige conta.
+          Para outros tipos de manifestação, <Link to="/login?registrar=1">entre com sua conta</Link>.
         </p>
 
-        <Botao type="submit" enviando={enviando}>Enviar denúncia</Botao>
+        <Botao type="submit" enviando={enviando}>Registrar denúncia</Botao>
       </form>
 
-      <section className="secao">
-        <Alerta tipo="info" titulo="Limitação atual">
-          <p>
-            Neste protótipo, o tipo de denúncia é previamente identificado como DENUNCIA porque a API pública ainda não
-            disponibiliza a lista de tipos.
-          </p>
-        </Alerta>
-      </section>
+      <Alerta tipo="discreto" titulo="Limitação atual">
+        <p>
+          Neste protótipo, o tipo de denúncia é previamente identificado como DENUNCIA porque a API pública ainda não
+          disponibiliza a lista de tipos.
+        </p>
+      </Alerta>
     </>
   )
 }

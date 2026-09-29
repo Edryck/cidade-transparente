@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom'
 import { relatoriosApi } from '../api/relatorios'
+import { BotaoLink } from '../componentes/Botao'
+import { CabecalhoPagina } from '../componentes/CabecalhoPagina'
 import { Carregando, ErroCarregamento, EstadoVazio } from '../componentes/Estados'
 import { useMunicipio } from '../contextos/MunicipioContext'
 import { dataCurta, diaDoInstante } from '../util/datas'
@@ -12,22 +13,26 @@ export default function RelatoriosGestao() {
   const { estado, tentarDeNovo } = useCarregar(() => relatoriosApi.listarAnos(municipio!.id), [municipio?.id])
   return (
     <>
-      <h1>Relatórios de gestão</h1>
-      <p>A cada ano, a ouvidoria publica quantas manifestações recebeu, os motivos, os prazos cumpridos e as providências adotadas (Lei 13.460, art. 15).</p>
-      <h2>Anos disponíveis</h2>
-      {estado.fase === 'carregando' && <Carregando />}
+      <CabecalhoPagina titulo="Relatórios de gestão"
+        descricao="Consulte os relatórios públicos da ouvidoria e do acesso à informação deste município (Lei 13.460, art. 15)."
+        trilha={[{ texto: 'Início', para: '/' }, { texto: 'Relatórios de gestão' }]} />
+      <h2>Relatórios disponíveis</h2>
+      {estado.fase === 'carregando' && <Carregando texto="Carregando relatórios…" />}
       {estado.fase === 'erro' && <ErroCarregamento erro={estado.erro} tentarDeNovo={tentarDeNovo} />}
       {estado.fase === 'pronto' && estado.dados.length === 0 && (
         <EstadoVazio titulo="Ainda não há relatório publicado">
-          <p>O relatório de um ano é publicado depois que ele termina. Volte depois ou fale com a ouvidoria.</p>
+          <p>O relatório de cada ano é publicado depois que ele termina. Volte depois ou fale com a ouvidoria.</p>
         </EstadoVazio>
       )}
       {estado.fase === 'pronto' && estado.dados.length > 0 && (
         <ul className="lista-anos">
           {estado.dados.map((r) => (
             <li key={r.ano}>
-              <Link to={`/relatorios/${r.ano}`}>Relatório de {r.ano}</Link>
-              <span className="metadado">publicado em <span className="mono">{dataCurta(diaDoInstante(r.publicadoEm))}</span></span>
+              <span>
+                <span className="lista-anos-ano">{r.ano}</span>
+                <span className="metadado"> · publicado em <span className="mono">{dataCurta(diaDoInstante(r.publicadoEm))}</span></span>
+              </span>
+              <BotaoLink to={`/relatorios/${r.ano}`} variante="secundario" aria-label={`Consultar relatório de ${r.ano}`}>Consultar</BotaoLink>
             </li>
           ))}
         </ul>
