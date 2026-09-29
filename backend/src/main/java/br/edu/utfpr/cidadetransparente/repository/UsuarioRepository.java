@@ -11,4 +11,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     /** Usado só no login, antes de existir token: por isso não filtra por município. */
     @EntityGraph(attributePaths = {"perfil", "municipio"})
     Optional<Usuario> findByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
 }

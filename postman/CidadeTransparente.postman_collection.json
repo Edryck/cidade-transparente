@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Cidade Transparente",
-    "description": "Testes de todos os endpoints da API. Rode a pasta Auth primeiro: cada login guarda o token do seu perfil em uma variável da coleção.",
+    "description": "Testes de todos os endpoints da API. Rode a coleção inteira, na ordem: as pastas iniciais guardam em variáveis os ids e os tokens de cada perfil que as seguintes usam.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -42,9 +42,64 @@
     {
       "key": "tokenOuvidorOutro",
       "value": ""
+    },
+    {
+      "key": "municipioDemoId",
+      "value": ""
+    },
+    {
+      "key": "cpfNovo",
+      "value": ""
+    },
+    {
+      "key": "tokenCidadaoNovo",
+      "value": ""
     }
   ],
   "item": [
+    {
+      "name": "Municípios",
+      "item": [
+        {
+          "name": "Listar municípios ativos (público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/ativos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "ativos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK sem token', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('expõe só id, nome e uf', () => lista.forEach(m => pm.expect(m).to.have.all.keys('id','nome','uf')));",
+                  "const demo = lista.find(m => m.nome === 'Vila Serena');",
+                  "pm.test('contém o município de demo', () => pm.expect(demo).to.exist);",
+                  "pm.collectionVariables.set('municipioDemoId', demo.id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Auth",
       "item": [
@@ -524,6 +579,241 @@
                 "exec": [
                   "pm.test('401', () => pm.response.to.have.status(401));",
                   "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registro de cidadão (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/registro-cidadao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "registro-cidadao"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"municipioId\": \"{{municipioDemoId}}\",\n  \"nome\": \"João Teste\",\n  \"email\": \"joao{{$timestamp}}@teste.com\",\n  \"senha\": \"senhaforte123\",\n  \"cpf\": \"{{cpfNovo}}\",\n  \"telefone\": \"41988887777\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// CPF válido e aleatório, para o registro poder rodar várias vezes sem conflito",
+                  "const n = Array.from({length: 9}, () => Math.floor(Math.random() * 10));",
+                  "const dv = a => { const r = (a.reduce((s, d, i) => s + d * (a.length + 1 - i), 0) * 10) % 11; return r === 10 ? 0 : r; };",
+                  "n.push(dv(n)); n.push(dv(n));",
+                  "pm.collectionVariables.set('cpfNovo', n.join(''));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const corpo = pm.response.json();",
+                  "const payload = JSON.parse(atob(corpo.token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
+                  "pm.test('já sai autenticado como CIDADAO', () => pm.expect(payload.roles).to.eql(['CIDADAO']));",
+                  "pm.test('no município escolhido', () => pm.expect(payload.municipioId).to.eql(Number(pm.collectionVariables.get('municipioDemoId'))));",
+                  "pm.collectionVariables.set('tokenCidadaoNovo', corpo.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registro com e-mail já cadastrado (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/registro-cidadao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "registro-cidadao"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"municipioId\": \"{{municipioDemoId}}\",\n  \"nome\": \"Outra Maria\",\n  \"email\": \"CIDADAO@demo.gov.br\",\n  \"senha\": \"senhaforte123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                  "pm.test('e-mail comparado sem diferenciar maiúsculas', () => pm.expect(pm.response.json().detail).to.include('e-mail'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registro com CPF já cadastrado no município (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/registro-cidadao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "registro-cidadao"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"municipioId\": \"{{municipioDemoId}}\",\n  \"nome\": \"Maria Clone\",\n  \"email\": \"clone{{$timestamp}}@teste.com\",\n  \"senha\": \"senhaforte123\",\n  \"cpf\": \"123.456.789-09\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                  "pm.test('mensagem cita o CPF', () => pm.expect(pm.response.json().detail).to.include('CPF'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registro em município inexistente (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/registro-cidadao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "registro-cidadao"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"municipioId\": 999999,\n  \"nome\": \"Sem Cidade\",\n  \"email\": \"semcidade{{$timestamp}}@teste.com\",\n  \"senha\": \"senhaforte123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registro com dados inválidos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/registro-cidadao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "registro-cidadao"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"email\": \"invalido\",\n  \"senha\": \"curta\",\n  \"cpf\": \"11111111111\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                  "pm.test('aponta cada campo inválido', () => pm.expect(pm.response.json().campos).to.have.all.keys('municipioId','nome','email','senha','cpf'));"
                 ]
               }
             }

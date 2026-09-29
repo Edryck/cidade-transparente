@@ -1,10 +1,17 @@
 package br.edu.utfpr.cidadetransparente.service;
 
 import br.edu.utfpr.cidadetransparente.config.JwtService;
+import br.edu.utfpr.cidadetransparente.domain.Cidadao;
+import br.edu.utfpr.cidadetransparente.domain.Municipio;
+import br.edu.utfpr.cidadetransparente.domain.Perfil;
 import br.edu.utfpr.cidadetransparente.domain.Usuario;
 import br.edu.utfpr.cidadetransparente.dto.LoginRequest;
 import br.edu.utfpr.cidadetransparente.dto.LoginResponse;
+import br.edu.utfpr.cidadetransparente.dto.RegistroCidadaoRequest;
 import br.edu.utfpr.cidadetransparente.exception.ApiException;
+import br.edu.utfpr.cidadetransparente.repository.CidadaoRepository;
+import br.edu.utfpr.cidadetransparente.repository.MunicipioRepository;
+import br.edu.utfpr.cidadetransparente.repository.PerfilRepository;
 import br.edu.utfpr.cidadetransparente.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,11 +19,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final MunicipioRepository municipioRepository;
+    private final PerfilRepository perfilRepository;
+    private final CidadaoRepository cidadaoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -31,7 +43,48 @@ public class AuthService {
         if (!usuario.isAtivo() || municipioInativo) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Usuário ou município desativado");
         }
+        return gerarResposta(usuario);
+    }
 
+    @Transactional
+    public LoginResponse registrarCidadao(RegistroCidadaoRequest request) {
+        Municipio municipio = municipioRepository.findById(request.municipioId())
+                .filter(Municipio::isAtivo)
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Município inexistente ou desativado"));
+
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        if (usuarioRepository.existsByEmailIgnoreCase(email)) {
+            throw ApiException.conflito("Já existe uma conta com este e-mail");
+        }
+        String cpf = request.cpf() == null ? null : request.cpf().replaceAll("\\D", "");
+        if (cpf != null && cidadaoRepository.existsByMunicipioIdAndCpf(municipio.getId(), cpf)) {
+            throw ApiException.conflito("Já existe um cidadão com este CPF neste município");
+        }
+
+        Perfil perfilCidadao = perfilRepository.findByNome(Perfil.CIDADAO)
+                .orElseThrow(() -> new IllegalStateException("Perfil CIDADAO ausente: migration V5 não aplicada"));
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(request.nome().trim());
+        usuario.setEmail(email);
+        usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
+        usuario.setPerfil(perfilCidadao);
+        usuario.setMunicipio(municipio);
+        usuarioRepository.save(usuario);
+
+        Cidadao cidadao = new Cidadao();
+        cidadao.setMunicipio(municipio);
+        cidadao.setUsuario(usuario);
+        cidadao.setNome(usuario.getNome());
+        cidadao.setEmail(email);
+        cidadao.setCpf(cpf);
+        cidadao.setTelefone(request.telefone());
+        cidadaoRepository.save(cidadao);
+
+        return gerarResposta(usuario);
+    }
+
+    private LoginResponse gerarResposta(Usuario usuario) {
         return new LoginResponse(
                 jwtService.gerarToken(usuario),
                 "Bearer",

@@ -109,7 +109,7 @@ Desvios: `EM_RECURSO` (depois de respondida, só LAI), `ARQUIVADA` (a partir de 
 | OUVIDOR | Ver todas as manifestações do município, encaminhar, prorrogar, arquivar, gerar relatório |
 | SERVIDOR | Ver e responder só as manifestações da própria secretaria |
 | CIDADAO | Registrar manifestação, acompanhar as próprias, abrir recurso |
-| Público (sem token) | Consultar andamento por número de protocolo |
+| Público (sem token) | Consultar andamento por número de protocolo, listar municípios ativos, registrar-se como cidadão |
 
 ## 7. Endpoints (rascunho)
 
@@ -118,7 +118,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Grupo | Endpoints |
 |---|---|
 | Auth | `POST /auth/login`, `POST /auth/registro-cidadao` |
-| Municípios | `GET/POST /municipios`, `GET/PUT /municipios/{id}` |
+| Municípios | `GET/POST /municipios`, `GET/PUT /municipios/{id}` (ADMIN_PLATAFORMA) |
 | Secretarias | CRUD `/secretarias` |
 | Usuários | CRUD `/usuarios` |
 | Tipos e prazos | `GET /tipos-manifestacao`, `PUT /tipos-manifestacao/{id}/prazo` |
@@ -128,7 +128,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Trâmites | `GET /manifestacoes/{id}/tramites` |
 | Respostas | `POST /manifestacoes/{id}/respostas` |
 | Recursos | `POST /respostas/{id}/recursos`, `PUT /recursos/{id}` (julgar) |
-| Público | `GET /protocolos/{numero}` |
+| Público | `GET /protocolos/{numero}`, `GET /municipios/ativos` (só id, nome e UF, para o cidadão escolher onde se registrar) |
 | Relatórios | `GET /relatorios/gestao?ano=` (total por tipo, por secretaria, % no prazo) |
 
 **Detalhe de projeto:** as ações são substantivos (`/prorrogacao`), não verbos (`/prorrogar`). Isso é o tipo de coisa que dá pra defender no vídeo de Richardson.
