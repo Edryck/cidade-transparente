@@ -85,6 +85,7 @@ Desvios: `EM_RECURSO` (depois de respondida, só LAI), `ARQUIVADA` (a partir de 
 - Ouvidoria (Lei 13.460/2017): 30 dias, prorrogável uma vez por mais 30
 - Pedido LAI (Lei 12.527/2011): 20 dias, prorrogável uma vez por mais 10
 - Os números ficam na tabela `PrazoLegal`, não no código, então mudar lei não exige deploy
+- Regra municipal só pode ser mais protetiva ao cidadão (art. 45 da LAI manda observar as normas gerais): prazos de resposta, prorrogação e julgamento iguais ou menores que os federais; prazo para o cidadão recorrer igual ou maior; tipo LAI não pode perder a fase recursal
 - Prorrogar exige justificativa e só pode acontecer uma vez
 - `data_limite` é calculada na abertura e gravada: mudar o PrazoLegal depois não altera manifestações já abertas
 - Recurso só existe para LAI (arts. 15 e 16 da Lei 12.527): 10 dias para interpor, 5 para julgar, julgado pelo OUVIDOR. A Lei 13.460 (ouvidoria) não prevê fase recursal
@@ -118,10 +119,10 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Grupo | Endpoints |
 |---|---|
 | Auth | `POST /auth/login`, `POST /auth/registro-cidadao` |
-| Municípios | `GET/POST /municipios`, `GET/PUT /municipios/{id}` (ADMIN_PLATAFORMA) |
-| Secretarias | CRUD `/secretarias` |
-| Usuários | CRUD `/usuarios` |
-| Tipos e prazos | `GET /tipos-manifestacao`, `PUT /tipos-manifestacao/{id}/prazo` |
+| Municípios | `GET/POST /municipios`, `GET/PUT /municipios/{id}` (ADMIN_PLATAFORMA). O POST cria junto o primeiro ADMIN; o código IBGE não muda depois |
+| Secretarias | CRUD `/secretarias` (leitura também para OUVIDOR). DELETE desativa, não apaga |
+| Usuários | CRUD `/usuarios` (ADMIN, só perfis ADMIN/OUVIDOR/SERVIDOR; filtro `?perfil=`). DELETE desativa, não apaga |
+| Tipos e prazos | `GET /tipos-manifestacao`, `GET /tipos-manifestacao/{id}`, `PUT/DELETE /tipos-manifestacao/{id}/prazo` (regra municipal; DELETE volta à federal) |
 | Manifestações | `POST /manifestacoes`, `GET /manifestacoes` (filtros + paginação), `GET /manifestacoes/{id}` |
 | Ações | `POST /manifestacoes/{id}/analise`, `/encaminhamento`, `/prorrogacao`, `/arquivamento`, `/encerramento` |
 | Anexos | `POST/GET /manifestacoes/{id}/anexos` |
