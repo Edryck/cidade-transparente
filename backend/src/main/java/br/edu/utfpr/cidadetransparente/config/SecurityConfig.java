@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/protocolos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/municipios/ativos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/municipios/*/privacidade").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // Sem isso, qualquer erro encaminhado para /error viraria 401
                         .requestMatchers("/error").permitAll()
