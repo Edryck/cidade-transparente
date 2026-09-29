@@ -130,6 +130,74 @@
     {
       "key": "emailCidadaoNovo",
       "value": ""
+    },
+    {
+      "key": "tipoDenunciaId",
+      "value": ""
+    },
+    {
+      "key": "reclamacaoId",
+      "value": ""
+    },
+    {
+      "key": "reclamacaoProtocolo",
+      "value": ""
+    },
+    {
+      "key": "reclamacaoChave",
+      "value": ""
+    },
+    {
+      "key": "laiId",
+      "value": ""
+    },
+    {
+      "key": "laiProtocolo",
+      "value": ""
+    },
+    {
+      "key": "laiChave",
+      "value": ""
+    },
+    {
+      "key": "denunciaId",
+      "value": ""
+    },
+    {
+      "key": "denunciaProtocolo",
+      "value": ""
+    },
+    {
+      "key": "denunciaChave",
+      "value": ""
+    },
+    {
+      "key": "msg404",
+      "value": ""
+    },
+    {
+      "key": "anexoId",
+      "value": ""
+    },
+    {
+      "key": "daquiA30",
+      "value": ""
+    },
+    {
+      "key": "dataLimiteAntes",
+      "value": ""
+    },
+    {
+      "key": "respostaLaiId",
+      "value": ""
+    },
+    {
+      "key": "recursoId",
+      "value": ""
+    },
+    {
+      "key": "prazoCumprimento",
+      "value": ""
     }
   ],
   "item": [
@@ -3124,7 +3192,8 @@
                   "const lai = tipos.find(t => t.codigo === 'PEDIDO_INFORMACAO');",
                   "pm.test('LAI federal: 20 + 10, recurso 10/5', () => pm.expect(lai.prazo).to.include({origem: 'FEDERAL', diasResposta: 20, diasProrrogacao: 10, diasInterposicaoRecurso: 10, diasJulgamentoRecurso: 5}));",
                   "pm.collectionVariables.set('tipoReclamacaoId', tipos.find(t => t.codigo === 'RECLAMACAO').id);",
-                  "pm.collectionVariables.set('tipoLaiId', lai.id);"
+                  "pm.collectionVariables.set('tipoLaiId', lai.id);",
+                  "pm.collectionVariables.set('tipoDenunciaId', tipos.find(t => t.codigo === 'DENUNCIA').id);"
                 ]
               }
             }
@@ -4735,6 +4804,3401 @@
                   "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
                 ]
               }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Manifestações",
+      "item": [
+        {
+          "name": "Abertura",
+          "item": [
+            {
+              "name": "Reclamação identificada (CIDADAO, 201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipoId\": \"{{tipoReclamacaoId}}\",\n  \"assunto\": \"Lâmpada queimada na praça\",\n  \"descricao\": \"A iluminação da Praça Central está apagada há uma semana.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "const c = pm.response.json();",
+                      "pm.test('Location aponta para a manifestação', () => pm.expect(pm.response.headers.get('Location')).to.eql(c._links.self.href));",
+                      "pm.test('protocolo ANO-IBGE-SEQUENCIAL', () => pm.expect(c.protocolo).to.match(new RegExp('^' + new Date().getFullYear() + '-9999901-\\\\d{6}$')));",
+                      "pm.test('chave aleatória entregue uma única vez', () => pm.expect(c.chaveAcesso).to.match(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/));",
+                      "pm.test('anonima = false', () => pm.expect(c.anonima).to.eql(false));",
+                      "pm.test('link para a consulta pública', () => pm.expect(c._links['consulta-publica'].href).to.include(c.protocolo));",
+                      "pm.collectionVariables.set('reclamacaoId', c.id);",
+                      "pm.collectionVariables.set('reclamacaoProtocolo', c.protocolo);",
+                      "pm.collectionVariables.set('reclamacaoChave', c.chaveAcesso);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pedido LAI (CIDADAO, 201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipoId\": \"{{tipoLaiId}}\",\n  \"assunto\": \"Gastos com merenda escolar\",\n  \"descricao\": \"Solicito os valores gastos com merenda escolar no primeiro semestre.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "const c = pm.response.json();",
+                      "pm.test('Location aponta para a manifestação', () => pm.expect(pm.response.headers.get('Location')).to.eql(c._links.self.href));",
+                      "pm.test('protocolo ANO-IBGE-SEQUENCIAL', () => pm.expect(c.protocolo).to.match(new RegExp('^' + new Date().getFullYear() + '-9999901-\\\\d{6}$')));",
+                      "pm.test('chave aleatória entregue uma única vez', () => pm.expect(c.chaveAcesso).to.match(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/));",
+                      "pm.test('anonima = false', () => pm.expect(c.anonima).to.eql(false));",
+                      "pm.test('link para a consulta pública', () => pm.expect(c._links['consulta-publica'].href).to.include(c.protocolo));",
+                      "pm.collectionVariables.set('laiId', c.id);",
+                      "pm.collectionVariables.set('laiProtocolo', c.protocolo);",
+                      "pm.collectionVariables.set('laiChave', c.chaveAcesso);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Denúncia anônima sem token (201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"municipioId\": \"{{municipioDemoId}}\",\n  \"tipoId\": \"{{tipoDenunciaId}}\",\n  \"assunto\": \"Obra sem placa\",\n  \"descricao\": \"Obra da prefeitura sem placa de identificação na Rua 3.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "const c = pm.response.json();",
+                      "pm.test('Location aponta para a manifestação', () => pm.expect(pm.response.headers.get('Location')).to.eql(c._links.self.href));",
+                      "pm.test('protocolo ANO-IBGE-SEQUENCIAL', () => pm.expect(c.protocolo).to.match(new RegExp('^' + new Date().getFullYear() + '-9999901-\\\\d{6}$')));",
+                      "pm.test('chave aleatória entregue uma única vez', () => pm.expect(c.chaveAcesso).to.match(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/));",
+                      "pm.test('anonima = true', () => pm.expect(c.anonima).to.eql(true));",
+                      "pm.test('link para a consulta pública', () => pm.expect(c._links['consulta-publica'].href).to.include(c.protocolo));",
+                      "pm.collectionVariables.set('denunciaId', c.id);",
+                      "pm.collectionVariables.set('denunciaProtocolo', c.protocolo);",
+                      "pm.collectionVariables.set('denunciaChave', c.chaveAcesso);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reclamação anônima (400: só denúncia pode ser anônima)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"municipioId\": \"{{municipioDemoId}}\",\n  \"tipoId\": \"{{tipoReclamacaoId}}\",\n  \"assunto\": \"X\",\n  \"descricao\": \"Y\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                      "pm.test('cita a lei', () => pm.expect(pm.response.json().detail).to.include('Lei 13.460'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Denúncia anônima sem municipioId (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipoId\": \"{{tipoDenunciaId}}\",\n  \"assunto\": \"X\",\n  \"descricao\": \"Y\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Abertura pelo OUVIDOR (403: a equipe não abre manifestação)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipoId\": \"{{tipoReclamacaoId}}\",\n  \"assunto\": \"X\",\n  \"descricao\": \"Y\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('403', () => pm.response.to.have.status(403));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Token inválido (401: não vira anônima em silêncio)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}x",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"municipioId\": \"{{municipioDemoId}}\",\n  \"tipoId\": \"{{tipoDenunciaId}}\",\n  \"assunto\": \"X\",\n  \"descricao\": \"Y\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('401', () => pm.response.to.have.status(401));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(401));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Dados inválidos (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assunto\": \"\",\n  \"descricao\": \"\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                      "pm.test('aponta os campos', () => pm.expect(pm.response.json().campos).to.have.all.keys('tipoId','assunto','descricao'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Tipo inexistente (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipoId\": 999999,\n  \"assunto\": \"X\",\n  \"descricao\": \"Y\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Consulta pública (protocolo + chave)",
+          "item": [
+            {
+              "name": "Consultar denúncia anônima (200)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Chave-Acesso",
+                    "value": "{{denunciaChave}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/protocolos/{{denunciaProtocolo}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "protocolos",
+                    "{{denunciaProtocolo}}"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const c = pm.response.json();",
+                      "pm.test('andamento visível', () => pm.expect(c.status).to.eql('RECEBIDA'));",
+                      "pm.test('nenhum dado de identificação', () => pm.expect(JSON.stringify(c)).to.not.match(/manifestante|cpf|email/i));",
+                      "pm.test('trâmites sem responsável nomeado', () => c.tramites.forEach(t => pm.expect(t.responsavel).to.be.null));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Chave errada (404)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Chave-Acesso",
+                    "value": "AAAA-BBBB-CCCC"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/protocolos/{{denunciaProtocolo}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "protocolos",
+                    "{{denunciaProtocolo}}"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('404', () => pm.response.to.have.status(404));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));",
+                      "pm.collectionVariables.set('msg404', pm.response.json().detail);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Protocolo inexistente (404, mesma mensagem da chave errada)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Chave-Acesso",
+                    "value": "{{denunciaChave}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/protocolos/2026-9999901-999999",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "protocolos",
+                    "2026-9999901-999999"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('404', () => pm.response.to.have.status(404));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));",
+                      "pm.test('não revela se o protocolo existe', () => pm.expect(pm.response.json().detail).to.eql(pm.collectionVariables.get('msg404')));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Sem chave (400)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/protocolos/{{denunciaProtocolo}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "protocolos",
+                    "{{denunciaProtocolo}}"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Demo: pedido LAI parcialmente concedido traz orientação de recurso",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Chave-Acesso",
+                    "value": "DEMO-000004"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/protocolos/2026-9999901-000004",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "protocolos",
+                    "2026-9999901-000004"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const r = pm.response.json().respostas[0];",
+                      "pm.test('art. 11, § 4º: informa prazo e instância do recurso', () => { pm.expect(r.recursoCabivel).to.be.true; pm.expect(r.prazoRecurso).to.be.a('string'); pm.expect(r.instanciaRecursal).to.include('art. 15'); });"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Anexos",
+          "item": [
+            {
+              "name": "Anexar PDF (CIDADAO dono, 201)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "arquivo",
+                      "type": "file",
+                      "src": "arquivos/documento.pdf"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "const a = pm.response.json();",
+                      "pm.test('tipo detectado pelo conteúdo', () => pm.expect(a.contentType).to.eql('application/pdf'));",
+                      "pm.collectionVariables.set('anexoId', a.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Anexar texto disfarçado de .pdf (400)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "arquivo",
+                      "type": "file",
+                      "src": "arquivos/falso.pdf"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                      "pm.test('recusado pelos bytes, não pela extensão', () => pm.expect(pm.response.json().detail).to.include('Formato'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Anexar sem o campo 'arquivo' (400)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "documento",
+                      "type": "file",
+                      "src": "arquivos/documento.pdf"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Listar anexos (OUVIDOR)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const a = pm.response.json()._embedded.anexos[0];",
+                      "pm.test('lista sem o conteúdo do arquivo', () => pm.expect(a).to.not.have.property('conteudo'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Baixar anexo (200, sempre como download)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos/{{anexoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos",
+                    "{{anexoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "pm.test('content-type do arquivo', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'));",
+                      "pm.test('Content-Disposition attachment', () => pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Baixar anexo pelo ouvidor de outro município (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos/{{anexoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos",
+                    "{{anexoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidorOutro}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('404', () => pm.response.to.have.status(404));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Listagem e visibilidade",
+          "item": [
+            {
+              "name": "Listar como OUVIDOR (paginado, ordenado pelo prazo)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const r = pm.response.json(); const l = r._embedded.manifestacoes;",
+                      "pm.test('paginação HAL', () => { pm.expect(r.page.size).to.eql(20); pm.expect(r.page.totalElements).to.be.at.least(8); });",
+                      "pm.test('ordenado por data limite', () => { const d = l.map(m => m.dataLimite); pm.expect(d).to.eql([...d].sort()); });",
+                      "pm.test('lista não traz identidade', () => l.forEach(m => pm.expect(m).to.not.have.property('manifestante')));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Filtrar por status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes?status=RECEBIDA",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "RECEBIDA"
+                    }
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "pm.test('só RECEBIDA', () => pm.response.json()._embedded.manifestacoes.forEach(m => pm.expect(m.status).to.eql('RECEBIDA')));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Filtrar o que vence nos próximos 30 dias",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes?vencimentoAte={{daquiA30}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ],
+                  "query": [
+                    {
+                      "key": "vencimentoAte",
+                      "value": "{{daquiA30}}"
+                    }
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 30); pm.collectionVariables.set('daquiA30', d.toISOString().slice(0, 10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "pm.test('só prazos até a data e ainda pendentes', () => (pm.response.json()._embedded?.manifestacoes || []).forEach(m => { pm.expect(m.dataLimite <= pm.collectionVariables.get('daquiA30')).to.be.true; pm.expect(['RECEBIDA','EM_ANALISE','ENCAMINHADA']).to.include(m.status); }));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "CIDADAO vê só as próprias",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes?size=100",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ],
+                  "query": [
+                    {
+                      "key": "size",
+                      "value": "100"
+                    }
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const p = pm.response.json()._embedded.manifestacoes.map(m => m.protocolo);",
+                      "pm.test('inclui a própria reclamação', () => pm.expect(p).to.include(pm.collectionVariables.get('reclamacaoProtocolo')));",
+                      "pm.test('não inclui a denúncia anônima', () => pm.expect(p).to.not.include(pm.collectionVariables.get('denunciaProtocolo')));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SERVIDOR vê só as da própria secretaria",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes?size=100",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ],
+                  "query": [
+                    {
+                      "key": "size",
+                      "value": "100"
+                    }
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "pm.test('todas da SEMOB', () => pm.response.json()._embedded.manifestacoes.forEach(m => pm.expect(m.secretariaSigla).to.eql('SEMOB')));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ADMIN não vê manifestações (403, LGPD art. 6º, III)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenAdmin}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('403', () => pm.response.to.have.status(403));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Ordenação por campo inexistente (400)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes?sort=inexistente",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "inexistente"
+                    }
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SERVIDOR não vê manifestação ainda não encaminhada (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('404', () => pm.response.to.have.status(404));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Ouvidor de outro município não vê (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidorOutro}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('404', () => pm.response.to.have.status(404));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fluxo de ouvidoria (reclamação)",
+          "item": [
+            {
+              "name": "RECEBIDA (OUVIDOR): análise, arquivamento, prorrogação",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('oferece analise, arquivamento, prorrogacao', () => pm.expect(rels).to.include.members(['analise', 'arquivamento', 'prorrogacao']));",
+                      "pm.test('não oferece encaminhamento, resposta, encerramento', () => ['encaminhamento', 'resposta', 'encerramento'].forEach(x => pm.expect(rels).to.not.include(x)));",
+                      "pm.test('ouvidor vê a identidade', () => pm.expect(pm.response.json().manifestante.email).to.eql('cidadao@demo.gov.br'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "RECEBIDA (CIDADAO dono): vê a si mesmo, sem ações de ouvidoria",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('oferece anexar', () => pm.expect(rels).to.include.members(['anexar']));",
+                      "pm.test('não oferece analise, arquivamento, prorrogacao', () => ['analise', 'arquivamento', 'prorrogacao'].forEach(x => pm.expect(rels).to.not.include(x)));",
+                      "pm.test('dono vê a própria identificação', () => pm.expect(pm.response.json().anonima).to.be.false);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encaminhar antes da análise (409)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/encaminhamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "encaminhamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"secretariaId\": \"{{secretariaSemobId}}\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                      "pm.test('explica o motivo', () => pm.expect(pm.response.json().detail).to.include('EM_ANALISE'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Análise (200)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/analise",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "analise"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('EM_ANALISE', () => pm.expect(pm.response.json().status).to.eql('EM_ANALISE'));",
+                      "pm.test('oferece encaminhamento', () => pm.expect(rels).to.include.members(['encaminhamento']));",
+                      "pm.test('não oferece analise', () => ['analise'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encaminhar para secretaria de outro município (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/encaminhamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "encaminhamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"secretariaId\": \"{{secretariaOutroId}}\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encaminhamento à SEMOB (200)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/encaminhamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "encaminhamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"secretariaId\": \"{{secretariaSemobId}}\",\n  \"observacao\": \"Competência da Secretaria de Obras.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "const m = pm.response.json();",
+                      "pm.test('ENCAMINHADA à SEMOB', () => { pm.expect(m.status).to.eql('ENCAMINHADA'); pm.expect(m.secretaria.sigla).to.eql('SEMOB'); });",
+                      "pm.test('oferece encaminhamento, prorrogacao', () => pm.expect(rels).to.include.members(['encaminhamento', 'prorrogacao']));",
+                      "pm.test('não oferece resposta, arquivamento', () => ['resposta', 'arquivamento'].forEach(x => pm.expect(rels).to.not.include(x)));",
+                      "pm.collectionVariables.set('dataLimiteAntes', m.dataLimite);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reencaminhar para a mesma secretaria (409)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/encaminhamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "encaminhamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"secretariaId\": \"{{secretariaSemobId}}\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SERVIDOR recebe sem a identidade (Lei 13.460, art. 10, § 7º)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "const m = pm.response.json();",
+                      "pm.test('sem manifestante nem indicação de anonimato', () => { pm.expect(m.manifestante).to.be.null; pm.expect(m.anonima).to.be.null; });",
+                      "pm.test('oferece resposta', () => pm.expect(rels).to.include.members(['resposta']));",
+                      "pm.test('não oferece encaminhamento, prorrogacao', () => ['encaminhamento', 'prorrogacao'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Trâmites vistos pelo SERVIDOR: cidadão aparece como 'Manifestante'",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/tramites",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "tramites"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const t = pm.response.json()._embedded.tramites;",
+                      "pm.test('abertura sem nome do cidadão', () => pm.expect(t[0].responsavel).to.eql('Manifestante'));",
+                      "pm.test('histórico completo', () => pm.expect(t.map(x => x.statusNovo)).to.eql(['RECEBIDA','EM_ANALISE','ENCAMINHADA']));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Prorrogação (200, uma única vez)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/prorrogacao",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "prorrogacao"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"Necessária vistoria técnica no local.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const m = pm.response.json();",
+                      "pm.test('marcada como prorrogada', () => pm.expect(m.prorrogada).to.be.true);",
+                      "pm.test('data limite adiada', () => pm.expect(m.dataLimite > pm.collectionVariables.get('dataLimiteAntes')).to.be.true);",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('não oferece prorrogacao', () => ['prorrogacao'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Segunda prorrogação (409)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/prorrogacao",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "prorrogacao"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"De novo.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                      "pm.test('uma única prorrogação', () => pm.expect(pm.response.json().detail).to.include('única'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Prorrogação sem justificativa (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/prorrogacao",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "prorrogacao"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resposta pelo OUVIDOR (403: quem responde é a secretaria)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/respostas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "respostas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"X\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('403', () => pm.response.to.have.status(403));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resposta com resultado LAI em reclamação (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/respostas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "respostas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"X\",\n  \"resultado\": \"CONCEDIDO\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resposta da SEMOB (201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/respostas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "respostas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"A lâmpada foi substituída em 02/10.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "pm.test('ouvidoria não tem recurso', () => pm.expect(pm.response.json().recursoCabivel).to.be.false);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "RESPONDIDA (CIDADAO): sem link de recurso (Lei 13.460 não prevê)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('não oferece recurso', () => ['recurso'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "RESPONDIDA (OUVIDOR): encerramento",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('oferece encerramento', () => pm.expect(rels).to.include.members(['encerramento']));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encerramento (200): nenhum link de ação",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/encerramento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "encerramento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('ENCERRADA', () => pm.expect(pm.response.json().status).to.eql('ENCERRADA'));",
+                      "pm.test('nenhum link de ação: só leitura', () => pm.expect(rels.filter(r => !['self','tramites','respostas','anexos'].includes(r))).to.be.empty);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Prorrogar manifestação encerrada (409)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/prorrogacao",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "prorrogacao"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"X\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Anexar em manifestação encerrada (409)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{reclamacaoId}}/anexos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{reclamacaoId}}",
+                    "anexos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "arquivo",
+                      "type": "file",
+                      "src": "arquivos/documento.pdf"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fluxo LAI com recurso",
+          "item": [
+            {
+              "name": "Análise",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/analise",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "analise"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encaminhamento à SEMOB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/encaminhamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "encaminhamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"secretariaId\": \"{{secretariaSemobId}}\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resposta LAI sem resultado (400, art. 11, § 1º)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/respostas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "respostas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"Segue.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resposta LAI com acesso negado (201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/respostas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "respostas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"Informação negada: contém dados pessoais de fornecedores.\",\n  \"resultado\": \"NEGADO\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "const r = pm.response.json();",
+                      "pm.test('art. 11, § 4º: prazo e instância do recurso', () => { pm.expect(r.recursoCabivel).to.be.true; pm.expect(r.prazoRecurso).to.be.a('string'); pm.expect(r.instanciaRecursal).to.include('Ouvidoria'); });",
+                      "pm.collectionVariables.set('respostaLaiId', r.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "RESPONDIDA (CIDADAO): link de recurso",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('oferece recurso', () => pm.expect(rels).to.include.members(['recurso']));",
+                      "pm.test('link aponta para a resposta', () => pm.expect(pm.response.json()._links.recurso.href).to.include('/respostas/' + pm.collectionVariables.get('respostaLaiId') + '/recursos'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encerrar antes do fim do prazo de recurso (409: tiraria um direito)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/encerramento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "encerramento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));",
+                      "pm.test('explica o motivo', () => pm.expect(pm.response.json().detail).to.include('prazo de recurso'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Recurso pelo OUVIDOR (403)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/respostas/{{respostaLaiId}}/recursos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "respostas",
+                    "{{respostaLaiId}}",
+                    "recursos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"X\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('403', () => pm.response.to.have.status(403));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Recurso do requerente (201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/respostas/{{respostaLaiId}}/recursos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "respostas",
+                    "{{respostaLaiId}}",
+                    "recursos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"Os valores gastos são informação pública; basta ocultar os dados pessoais (LAI art. 7º, § 2º).\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "const r = pm.response.json();",
+                      "pm.test('PENDENTE com prazo de julgamento', () => { pm.expect(r.status).to.eql('PENDENTE'); pm.expect(r.dataLimiteJulgamento).to.be.a('string'); });",
+                      "pm.collectionVariables.set('recursoId', r.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Segundo recurso (409, instância única)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/respostas/{{respostaLaiId}}/recursos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "respostas",
+                    "{{respostaLaiId}}",
+                    "recursos"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"De novo.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('409', () => pm.response.to.have.status(409));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "EM_RECURSO (OUVIDOR): link de julgamento",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('oferece julgamento', () => pm.expect(rels).to.include.members(['julgamento']));",
+                      "pm.test('recurso no detalhe', () => pm.expect(pm.response.json().recurso.status).to.eql('PENDENTE'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Julgamento pelo SERVIDOR (403)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/recursos/{{recursoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "recursos",
+                    "{{recursoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resultado\": \"DEFERIDO\",\n  \"decisao\": \"X\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('403', () => pm.response.to.have.status(403));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Deferido sem prazo de cumprimento (400)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/recursos/{{recursoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "recursos",
+                    "{{recursoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resultado\": \"DEFERIDO\",\n  \"decisao\": \"Procede.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Recurso deferido (200): volta à secretaria com novo prazo",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/recursos/{{recursoId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "recursos",
+                    "{{recursoId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resultado\": \"DEFERIDO\",\n  \"decisao\": \"Procede: fornecer os valores com os dados pessoais ocultados.\",\n  \"prazoCumprimento\": \"{{prazoCumprimento}}\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 5); pm.collectionVariables.set('prazoCumprimento', d.toISOString().slice(0, 10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "pm.test('DEFERIDO', () => pm.expect(pm.response.json().status).to.eql('DEFERIDO'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Manifestação voltou a ENCAMINHADA com o prazo fixado",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const m = pm.response.json();",
+                      "pm.test('ENCAMINHADA até o prazo do julgamento', () => { pm.expect(m.status).to.eql('ENCAMINHADA'); pm.expect(m.dataLimite).to.eql(pm.collectionVariables.get('prazoCumprimento')); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Nova resposta concedendo o acesso (201)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/respostas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "respostas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenServidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"Seguem os valores, com os dados pessoais ocultados.\",\n  \"resultado\": \"CONCEDIDO\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('201', () => pm.response.to.have.status(201));",
+                      "pm.test('sem novo recurso', () => pm.expect(pm.response.json().recursoCabivel).to.be.false);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "CIDADAO: sem link de recurso (instância única)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('não oferece recurso', () => ['recurso'].forEach(x => pm.expect(rels).to.not.include(x)));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Encerramento (200)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/encerramento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "encerramento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('nenhum link de ação: só leitura', () => pm.expect(rels.filter(r => !['self','tramites','respostas','anexos'].includes(r))).to.be.empty);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Histórico completo do pedido",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{laiId}}/tramites",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{laiId}}",
+                    "tramites"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenCidadao}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "pm.test('todas as etapas', () => pm.expect(pm.response.json()._embedded.tramites.map(t => t.statusNovo)).to.eql(['RECEBIDA','EM_ANALISE','ENCAMINHADA','RESPONDIDA','EM_RECURSO','ENCAMINHADA','RESPONDIDA','ENCERRADA']));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Denúncia anônima",
+          "item": [
+            {
+              "name": "OUVIDOR vê que é anônima",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{denunciaId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{denunciaId}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const m = pm.response.json();",
+                      "pm.test('anônima, sem manifestante', () => { pm.expect(m.anonima).to.be.true; pm.expect(m.manifestante).to.be.null; });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Arquivamento sem justificativa (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{denunciaId}}/arquivamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{denunciaId}}",
+                    "arquivamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('400', () => pm.response.to.have.status(400));",
+                      "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Arquivamento (200): nenhum link de ação",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/manifestacoes/{{denunciaId}}/arquivamento",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "manifestacoes",
+                    "{{denunciaId}}",
+                    "arquivamento"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenOuvidor}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"justificativa\": \"Obra regular: a placa foi instalada.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const rels = Object.keys(pm.response.json()._links);",
+                      "pm.test('ARQUIVADA', () => pm.expect(pm.response.json().status).to.eql('ARQUIVADA'));",
+                      "pm.test('nenhum link de ação: só leitura', () => pm.expect(rels.filter(r => !['self','tramites','respostas','anexos'].includes(r))).to.be.empty);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Denunciante acompanha o arquivamento pela consulta pública",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Chave-Acesso",
+                    "value": "{{denunciaChave}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/protocolos/{{denunciaProtocolo}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "protocolos",
+                    "{{denunciaProtocolo}}"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('200', () => pm.response.to.have.status(200));",
+                      "const c = pm.response.json();",
+                      "pm.test('ARQUIVADA com a justificativa no histórico', () => { pm.expect(c.status).to.eql('ARQUIVADA'); pm.expect(c.tramites.at(-1).descricao).to.include('placa foi instalada'); });"
+                    ]
+                  }
+                }
+              ]
             }
           ]
         }
