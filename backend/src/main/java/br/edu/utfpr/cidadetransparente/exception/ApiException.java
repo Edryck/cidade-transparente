@@ -14,6 +14,14 @@ public class ApiException extends RuntimeException {
         this.status = status;
     }
 
+    public static ApiException requisicaoInvalida(String mensagem) {
+        return new ApiException(HttpStatus.BAD_REQUEST, mensagem);
+    }
+
+    public static ApiException proibido(String mensagem) {
+        return new ApiException(HttpStatus.FORBIDDEN, mensagem);
+    }
+
     public static ApiException naoEncontrado(String mensagem) {
         return new ApiException(HttpStatus.NOT_FOUND, mensagem);
     }
