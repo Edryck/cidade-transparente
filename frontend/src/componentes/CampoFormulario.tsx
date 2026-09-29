@@ -14,17 +14,19 @@ type Props = {
   obrigatorio: boolean
   ajuda?: ReactNode
   erro?: string
+  /** Classe extra no bloco do campo (ex.: campo-codigo para protocolo e chave). */
+  classe?: string
   /** Recebe id, aria-describedby e aria-invalid já ligados ao rótulo, à ajuda e ao erro. */
   children: (props: PropsControle) => ReactNode
 }
 
 /** Rótulo sempre visível, "(obrigatório)"/"(opcional)" escrito, ajuda e erro ligados ao campo. */
-export function CampoFormulario({ id, rotulo, obrigatorio, ajuda, erro, children }: Props) {
+export function CampoFormulario({ id, rotulo, obrigatorio, ajuda, erro, classe, children }: Props) {
   const idAjuda = ajuda ? `${id}-ajuda` : undefined
   const idErro = erro ? `${id}-erro` : undefined
   const descricao = [idAjuda, idErro].filter(Boolean).join(' ') || undefined
   return (
-    <div className={`campo${erro ? ' campo-com-erro' : ''}`}>
+    <div className={`campo${erro ? ' campo-com-erro' : ''}${classe ? ' ' + classe : ''}`}>
       <label htmlFor={id} className="campo-rotulo">
         {rotulo} <span className="campo-exigencia">({obrigatorio ? 'obrigatório' : 'opcional'})</span>
       </label>

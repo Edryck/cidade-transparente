@@ -26,17 +26,17 @@ export function estadoDoPrazo(p: Props): Estado | null {
   if (p.respondidaEm && !AGUARDANDO.includes(p.status)) {
     const dia = diaDoInstante(p.respondidaEm)
     return dia <= p.dataLimite
-      ? { chave: 'respondida', rotulo: 'Respondida no prazo', texto: `respondida em ${dataCurta(dia)}` }
-      : { chave: 'vencido', rotulo: 'Respondida fora do prazo', texto: `respondida em ${dataCurta(dia)}` }
+      ? { chave: 'respondida', rotulo: 'Respondida no prazo', texto: `Respondida em ${dataCurta(dia)}` }
+      : { chave: 'vencido', rotulo: 'Respondida fora do prazo', texto: `Respondida em ${dataCurta(dia)}` }
   }
   if (!AGUARDANDO.includes(p.status)) return null
   const faltam = diasEntre(hoje, p.dataLimite)
-  if (faltam < 0) return { chave: 'vencido', rotulo: 'Vencido', texto: `venceu há ${plural(-faltam, 'dia', 'dias')}` }
-  if (faltam === 0) return { chave: 'vencendo', rotulo: 'Vencendo', texto: 'vence hoje' }
-  const texto = `faltam ${plural(faltam, 'dia corrido', 'dias corridos')}`
-  if (faltam <= 5) return { chave: 'vencendo', rotulo: 'Vencendo', texto }
-  if (p.prorrogada) return { chave: 'prorrogado', rotulo: 'Prorrogado', texto }
-  return { chave: 'no-prazo', rotulo: 'No prazo', texto }
+  if (faltam < 0) return { chave: 'vencido', rotulo: 'Prazo vencido', texto: `Venceu há ${plural(-faltam, 'dia', 'dias')}` }
+  if (faltam === 0) return { chave: 'vencendo', rotulo: 'Vence hoje', texto: 'Vence hoje' }
+  const texto = `Faltam ${plural(faltam, 'dia', 'dias')}`
+  if (faltam <= 5) return { chave: 'vencendo', rotulo: 'Perto do vencimento', texto }
+  if (p.prorrogada) return { chave: 'prorrogado', rotulo: 'Prazo prorrogado', texto }
+  return { chave: 'no-prazo', rotulo: 'Dentro do prazo', texto }
 }
 
 const ICONES = { 'no-prazo': Clock, vencendo: TriangleAlert, vencido: OctagonAlert, prorrogado: TriangleAlert, respondida: CircleCheck }
@@ -45,40 +45,40 @@ export function ReguaPrazo(props: Props) {
   const estado = estadoDoPrazo(props)
   if (!estado) return null
   const Icone = ICONES[estado.chave]
+
+  if (props.compacta) {
+    return (
+      <p className={`regua-compacta regua-${estado.chave}`}>
+        <Icone aria-hidden size={18} strokeWidth={2} />
+        <strong>{estado.texto}</strong>
+        {estado.rotulo !== estado.texto && <span className="metadado">{estado.rotulo}</span>}
+      </p>
+    )
+  }
+
   const abertura = diaDoInstante(props.dataAbertura)
   const total = Math.max(1, diasEntre(abertura, props.dataLimite))
-  const ate = props.respondidaEm && estado.chave !== 'no-prazo' && estado.chave !== 'vencendo' && estado.chave !== 'prorrogado'
-    ? diaDoInstante(props.respondidaEm)
-    : hojeISO()
-  const proporcao = Math.min(1, Math.max(0, diasEntre(abertura, ate) / total))
-
-  const rotulo = (
-    <p className={`regua-estado regua-${estado.chave}`}>
-      <Icone aria-hidden size={20} strokeWidth={1.5} />
-      <span className="regua-rotulo">{estado.rotulo}</span>
-      <span className="mono">{estado.texto}</span>
-    </p>
-  )
-  if (props.compacta) return rotulo
+  const parouEm = estado.chave === 'respondida' || (estado.chave === 'vencido' && props.respondidaEm)
+    ? diaDoInstante(props.respondidaEm!) : hojeISO()
+  const proporcao = Math.min(1, Math.max(0, diasEntre(abertura, parouEm) / total))
 
   return (
-    <div className="regua">
-      {rotulo}
-      <div className={`regua-barra regua-${estado.chave}`} aria-hidden>
-        <span style={{ width: `${Math.round(proporcao * 100)}%` }} />
-      </div>
+    <section className={`regua regua-${estado.chave}`} aria-labelledby="regua-titulo">
+      <h2 id="regua-titulo" className="regua-titulo">Prazo da manifestação</h2>
+      <p className="regua-estado">
+        <Icone aria-hidden size={22} strokeWidth={2} />
+        <span className="regua-texto">{estado.texto}</span>
+        <span className="regua-rotulo">{estado.rotulo}</span>
+      </p>
+      <div className="regua-barra" aria-hidden><span style={{ width: `${Math.round(proporcao * 100)}%` }} /></div>
       <dl className="regua-datas">
+        <div><dt>Prazo total</dt><dd>{plural(total, 'dia corrido', 'dias corridos')}{props.prorrogada ? ', com prorrogação' : ''}</dd></div>
+        <div><dt>Aberta em</dt><dd className="mono">{dataCurta(abertura)}</dd></div>
         <div>
-          <dt>Aberta em</dt>
-          <dd className="mono">{dataCurta(abertura)}</dd>
-        </div>
-        <div>
-          <dt>Data limite{props.prorrogada ? ' (prorrogada)' : ''}</dt>
-          <dd className="mono">
-            {dataCurta(props.dataLimite)} <span className="regua-dia">{diaDaSemana(props.dataLimite)}</span>
-          </dd>
+          <dt>Data limite</dt>
+          <dd><span className="mono">{dataCurta(props.dataLimite)}</span> <span className="regua-dia">({diaDaSemana(props.dataLimite)})</span></dd>
         </div>
       </dl>
-    </div>
+    </section>
   )
 }

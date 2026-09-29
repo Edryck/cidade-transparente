@@ -1,11 +1,11 @@
-import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import type { Resposta, Tramite } from '../api/protocolos'
 import { dataCurta, dataHora } from '../util/datas'
 import { Alerta } from './Alerta'
 import { textoSituacao } from './BadgeSituacao'
 
-/** Histórico em ordem: trilho à esquerda, um ponto por movimento, o último em destaque (estado atual). */
+/** Histórico em linha vertical simples: data, o que aconteceu e, quando a API mostra, quem fez. */
 export function LinhaTramitacao({ tramites }: { tramites: Tramite[] }) {
   return (
     <ol className="tramitacao">
@@ -13,12 +13,15 @@ export function LinhaTramitacao({ tramites }: { tramites: Tramite[] }) {
         const atual = i === tramites.length - 1
         return (
           <li key={i} className={atual ? 'tramitacao-atual' : undefined} aria-current={atual ? 'step' : undefined}>
+            <time className="tramitacao-data mono" dateTime={t.registradoEm}>{dataHora(t.registradoEm)}</time>
             <p className="tramitacao-acao">{t.descricao}</p>
-            <p className="metadado">
-              <time className="mono" dateTime={t.registradoEm}>{dataHora(t.registradoEm)}</time>
-              {t.responsavel && <> · {t.responsavel}</>}
-              {atual && <> · situação atual: {textoSituacao(t.statusNovo).toLowerCase()}</>}
-            </p>
+            {(t.responsavel || atual) && (
+              <p className="tramitacao-detalhe">
+                {t.responsavel}
+                {t.responsavel && atual && ' · '}
+                {atual && <>Situação atual: {textoSituacao(t.statusNovo).toLowerCase()}</>}
+              </p>
+            )}
           </li>
         )
       })}
@@ -33,7 +36,7 @@ const RESULTADO: Record<string, string> = {
   INEXISTENTE: 'A prefeitura não possui a informação',
 }
 
-/** Resposta oficial: fundo papel-baixo e borda esquerda discreta (DESIGN.md, Linha de tramitação). */
+/** Resposta oficial: um registro administrativo, com órgão e data. Nunca aparência de conversa. */
 export function RespostaOficial({ resposta, recursoJaApresentado, acaoRecurso }: {
   resposta: Resposta
   recursoJaApresentado: boolean
@@ -42,17 +45,17 @@ export function RespostaOficial({ resposta, recursoJaApresentado, acaoRecurso }:
 }) {
   return (
     <article className="resposta-oficial">
-      <h3>Resposta da {resposta.secretaria}</h3>
-      <p className="metadado">
-        <time className="mono" dateTime={resposta.respondidaEm}>{dataHora(resposta.respondidaEm)}</time>
-        {resposta.resultadoLai && <> · {RESULTADO[resposta.resultadoLai]}</>}
-      </p>
+      <header className="resposta-cabecalho">
+        <h3>Resposta oficial da {resposta.secretaria}</h3>
+        <time className="metadado mono" dateTime={resposta.respondidaEm}>{dataHora(resposta.respondidaEm)}</time>
+      </header>
+      {resposta.resultadoLai && <p><strong>Resultado do pedido:</strong> {RESULTADO[resposta.resultadoLai]}</p>}
       <p className="resposta-texto">{resposta.texto}</p>
       {resposta.recursoCabivel && !recursoJaApresentado && resposta.prazoRecurso && (
-        <Alerta tipo="atencao" titulo="Você pode apresentar recurso">
+        <Alerta tipo="info" titulo="Você pode apresentar recurso">
           <dl className="dados">
             <dt>Prazo para recurso</dt>
-            <dd className="mono">até {dataCurta(resposta.prazoRecurso)}</dd>
+            <dd><span className="mono">até {dataCurta(resposta.prazoRecurso)}</span></dd>
             <dt>Instância recursal</dt>
             <dd>{resposta.instanciaRecursal}</dd>
           </dl>

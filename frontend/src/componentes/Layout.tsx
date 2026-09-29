@@ -7,19 +7,39 @@ import { CabecalhoMunicipio } from './CabecalhoMunicipio'
 export function LayoutPublico() {
   return (
     <>
-      <a className="pular" href="#conteudo">Pular para o conteúdo</a>
+      {/* Faixa institucional com atalhos de acessibilidade, como nos serviços públicos digitais (DESIGN.md 36) */}
+      <div className="faixa">
+        <div className="faixa-dentro">
+          <span className="faixa-marca">Cidade Transparente</span>
+          <nav aria-label="Atalhos de acessibilidade">
+            <ul>
+              <li><a href="#conteudo">Ir para o conteúdo</a></li>
+              <li><a href="#navegacao">Ir para o menu</a></li>
+              <li><a href="#rodape">Ir para o rodapé</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
       <CabecalhoMunicipio />
       <main id="conteudo" className="pagina" tabIndex={-1}>
         <Outlet />
       </main>
-      <footer className="rodape">
+      <footer id="rodape" className="rodape">
         <div className="rodape-dentro">
+          <p className="rodape-marca">
+            <strong>Cidade Transparente</strong>
+            <br />
+            Ouvidoria e acesso à informação para prefeituras
+          </p>
           <nav aria-label="Rodapé">
-            <Link to="/acompanhar">Acompanhar protocolo</Link>
-            <Link to="/privacidade">Aviso de privacidade</Link>
-            <Link to="/relatorios">Relatórios de gestão</Link>
+            <ul>
+              <li><Link to="/acompanhar">Acompanhar protocolo</Link></li>
+              <li><Link to="/privacidade">Aviso de privacidade</Link></li>
+              <li><Link to="/relatorios">Relatórios de gestão</Link></li>
+              <li><Link to="/municipios">Trocar município</Link></li>
+              <li><a href="#conteudo">Voltar ao topo</a></li>
+            </ul>
           </nav>
-          <p className="metadado">Cidade Transparente</p>
         </div>
       </footer>
     </>

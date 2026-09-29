@@ -1,9 +1,9 @@
 import { CircleAlert, Info, Lock, TriangleAlert, CircleCheck } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-type Tipo = 'info' | 'atencao' | 'erro' | 'sucesso' | 'sigilo'
+type Tipo = 'info' | 'atencao' | 'erro' | 'sucesso' | 'sigilo' | 'discreto'
 
-const ICONES = { info: Info, atencao: TriangleAlert, erro: CircleAlert, sucesso: CircleCheck, sigilo: Lock }
+const ICONES = { info: Info, atencao: TriangleAlert, erro: CircleAlert, sucesso: CircleCheck, sigilo: Lock, discreto: Info }
 
 /** Faixa de aviso: fundo da cor a 10%, borda a 40%, ícone e texto. Erro é anunciado ao leitor de tela. */
 export function Alerta({ tipo = 'info', titulo, children, id }: { tipo?: Tipo; titulo?: string; children: ReactNode; id?: string }) {
