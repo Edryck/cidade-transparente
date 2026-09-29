@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import type { Resposta, Tramite } from '../api/protocolos'
 import { dataCurta, dataHora } from '../util/datas'
 import { Alerta } from './Alerta'
@@ -33,7 +34,12 @@ const RESULTADO: Record<string, string> = {
 }
 
 /** Resposta oficial: fundo papel-baixo e borda esquerda discreta (DESIGN.md, Linha de tramitação). */
-export function RespostaOficial({ resposta, recursoJaApresentado }: { resposta: Resposta; recursoJaApresentado: boolean }) {
+export function RespostaOficial({ resposta, recursoJaApresentado, acaoRecurso }: {
+  resposta: Resposta
+  recursoJaApresentado: boolean
+  /** Para quem está logado e recebeu da API o link de recurso: o formulário substitui o convite para entrar. */
+  acaoRecurso?: ReactNode
+}) {
   return (
     <article className="resposta-oficial">
       <h3>Resposta da {resposta.secretaria}</h3>
@@ -50,10 +56,12 @@ export function RespostaOficial({ resposta, recursoJaApresentado }: { resposta: 
             <dt>Instância recursal</dt>
             <dd>{resposta.instanciaRecursal}</dd>
           </dl>
-          <p>
-            Você pode apresentar recurso dentro do prazo indicado. Para recorrer, é necessário estar autenticado.{' '}
-            <Link to="/login">Entrar</Link>
-          </p>
+          {acaoRecurso ?? (
+            <p>
+              Você pode apresentar recurso dentro do prazo indicado. Para recorrer, é necessário estar autenticado.{' '}
+              <Link to="/login">Entrar</Link>
+            </p>
+          )}
         </Alerta>
       )}
     </article>

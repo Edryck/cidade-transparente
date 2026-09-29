@@ -38,3 +38,21 @@
   .protocolo { font-size: 20pt; }
   .chave { font-size: 22pt; }
 }
+
+@layer paginas {
+  .titulo-com-acao { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-bottom: 8px; }
+  .titulo-com-acao h1 { margin: 0; }
+  .filtros-cidadao { display: grid; gap: 12px 16px; margin: 20px 0 8px; }
+  @media (min-width: 480px) { .filtros-cidadao { grid-template-columns: 1fr 1fr; } }
+  .paginacao { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; }
+
+  .detalhe-manifestacao > .protocolo { margin-bottom: 8px; }
+  .detalhe-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+}
+
+@media print {
+  .navegacao-cidadao, .botao-menu { display: none !important; }
+  .detalhe-manifestacao .regua, .resposta-oficial { background: #fff; border-color: #000; }
+  .detalhe-manifestacao * { color: #000 !important; }
+  .detalhe-manifestacao .alerta .botao, .detalhe-manifestacao form { display: none !important; }
+}
