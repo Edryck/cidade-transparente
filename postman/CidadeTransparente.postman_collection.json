@@ -54,11 +54,75 @@
     {
       "key": "tokenCidadaoNovo",
       "value": ""
+    },
+    {
+      "key": "idPlataforma",
+      "value": ""
+    },
+    {
+      "key": "idAdmin",
+      "value": ""
+    },
+    {
+      "key": "idOuvidor",
+      "value": ""
+    },
+    {
+      "key": "idServidor",
+      "value": ""
+    },
+    {
+      "key": "idCidadao",
+      "value": ""
+    },
+    {
+      "key": "idOuvidorOutro",
+      "value": ""
+    },
+    {
+      "key": "ibgeNovo",
+      "value": ""
+    },
+    {
+      "key": "municipioNovoId",
+      "value": ""
+    },
+    {
+      "key": "adminNovoEmail",
+      "value": ""
+    },
+    {
+      "key": "secretariaSemobId",
+      "value": ""
+    },
+    {
+      "key": "secretariaOutroId",
+      "value": ""
+    },
+    {
+      "key": "secretariaNovaId",
+      "value": ""
+    },
+    {
+      "key": "usuarioNovoId",
+      "value": ""
+    },
+    {
+      "key": "usuarioNovoEmail",
+      "value": ""
+    },
+    {
+      "key": "tipoReclamacaoId",
+      "value": ""
+    },
+    {
+      "key": "tipoLaiId",
+      "value": ""
     }
   ],
   "item": [
     {
-      "name": "Municípios",
+      "name": "Público",
       "item": [
         {
           "name": "Listar municípios ativos (público)",
@@ -143,7 +207,8 @@
                   "const payload = JSON.parse(atob(pm.response.json().token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('roles = [ADMIN_PLATAFORMA]', () => pm.expect(payload.roles).to.eql(['ADMIN_PLATAFORMA']));",
                   "pm.test('token NÃO traz municipioId', () => pm.expect(payload).to.not.have.property('municipioId'));",
-                  "pm.collectionVariables.set('tokenPlataforma', pm.response.json().token);"
+                  "pm.collectionVariables.set('tokenPlataforma', pm.response.json().token);",
+                  "pm.collectionVariables.set('idPlataforma', pm.response.json().usuarioId);"
                 ]
               }
             }
@@ -189,7 +254,8 @@
                   "const payload = JSON.parse(atob(pm.response.json().token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('roles = [ADMIN]', () => pm.expect(payload.roles).to.eql(['ADMIN']));",
                   "pm.test('token traz municipioId', () => pm.expect(payload.municipioId).to.be.a('number'));",
-                  "pm.collectionVariables.set('tokenAdmin', pm.response.json().token);"
+                  "pm.collectionVariables.set('tokenAdmin', pm.response.json().token);",
+                  "pm.collectionVariables.set('idAdmin', pm.response.json().usuarioId);"
                 ]
               }
             }
@@ -235,7 +301,8 @@
                   "const payload = JSON.parse(atob(pm.response.json().token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('roles = [OUVIDOR]', () => pm.expect(payload.roles).to.eql(['OUVIDOR']));",
                   "pm.test('token traz municipioId', () => pm.expect(payload.municipioId).to.be.a('number'));",
-                  "pm.collectionVariables.set('tokenOuvidor', pm.response.json().token);"
+                  "pm.collectionVariables.set('tokenOuvidor', pm.response.json().token);",
+                  "pm.collectionVariables.set('idOuvidor', pm.response.json().usuarioId);"
                 ]
               }
             }
@@ -281,7 +348,8 @@
                   "const payload = JSON.parse(atob(pm.response.json().token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('roles = [SERVIDOR]', () => pm.expect(payload.roles).to.eql(['SERVIDOR']));",
                   "pm.test('token traz municipioId', () => pm.expect(payload.municipioId).to.be.a('number'));",
-                  "pm.collectionVariables.set('tokenServidor', pm.response.json().token);"
+                  "pm.collectionVariables.set('tokenServidor', pm.response.json().token);",
+                  "pm.collectionVariables.set('idServidor', pm.response.json().usuarioId);"
                 ]
               }
             }
@@ -327,7 +395,8 @@
                   "const payload = JSON.parse(atob(pm.response.json().token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('roles = [CIDADAO]', () => pm.expect(payload.roles).to.eql(['CIDADAO']));",
                   "pm.test('token traz municipioId', () => pm.expect(payload.municipioId).to.be.a('number'));",
-                  "pm.collectionVariables.set('tokenCidadao', pm.response.json().token);"
+                  "pm.collectionVariables.set('tokenCidadao', pm.response.json().token);",
+                  "pm.collectionVariables.set('idCidadao', pm.response.json().usuarioId);"
                 ]
               }
             }
@@ -373,7 +442,8 @@
                   "const payload = JSON.parse(atob(pm.response.json().token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
                   "pm.test('roles = [OUVIDOR]', () => pm.expect(payload.roles).to.eql(['OUVIDOR']));",
                   "pm.test('token traz municipioId', () => pm.expect(payload.municipioId).to.be.a('number'));",
-                  "pm.collectionVariables.set('tokenOuvidorOutro', pm.response.json().token);"
+                  "pm.collectionVariables.set('tokenOuvidorOutro', pm.response.json().token);",
+                  "pm.collectionVariables.set('idOuvidorOutro', pm.response.json().usuarioId);"
                 ]
               }
             }
@@ -814,6 +884,2808 @@
                   "pm.test('400', () => pm.response.to.have.status(400));",
                   "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
                   "pm.test('aponta cada campo inválido', () => pm.expect(pm.response.json().campos).to.have.all.keys('municipioId','nome','email','senha','cpf'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Municípios (ADMIN_PLATAFORMA)",
+      "item": [
+        {
+          "name": "Listar municípios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('coleção HAL de municípios', () => pm.expect(pm.response.json()._embedded.municipios.length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar município com primeiro ADMIN (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nova Esperança do Teste\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"{{ibgeNovo}}\",\n  \"admin\": {\n    \"nome\": \"Gestora Nova\",\n    \"email\": \"admin{{$timestamp}}@nova.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Código IBGE fictício (prefixo 98) para rodar a coleção várias vezes sem conflito",
+                  "pm.collectionVariables.set('ibgeNovo', '98' + String(Math.floor(Math.random() * 1e5)).padStart(5, '0'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('Location aponta para o recurso', () => pm.expect(pm.response.headers.get('Location')).to.eql(pm.response.json()._links.self.href));",
+                  "pm.test('HAL com link self', () => pm.expect(pm.response.json()._links.self.href).to.be.a('string'));",
+                  "pm.collectionVariables.set('municipioNovoId', pm.response.json().id);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('adminNovoEmail', JSON.parse(pm.request.body.raw).admin.email);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login do ADMIN do município novo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminNovoEmail}}\",\n  \"senha\": \"senhaforte123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('ADMIN do município recém-criado', () => pm.expect(pm.response.json().municipioId).to.eql(pm.collectionVariables.get('municipioNovoId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar município com IBGE já usado (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Clone\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"9999901\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"x{{$timestamp}}@x.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar município com e-mail de admin já usado (409, nada é criado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sem Admin\",\n  \"uf\": \"PR\",\n  \"codigoIbge\": \"{{ibgeNovo}}\",\n  \"admin\": {\n    \"nome\": \"X\",\n    \"email\": \"admin@demo.gov.br\",\n    \"senha\": \"senhaforte123\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Código IBGE fictício (prefixo 98) para rodar a coleção várias vezes sem conflito",
+                  "pm.collectionVariables.set('ibgeNovo', '98' + String(Math.floor(Math.random() * 1e5)).padStart(5, '0'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar município com dados inválidos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"uf\": \"pr\",\n  \"codigoIbge\": \"123\",\n  \"admin\": {\n    \"nome\": \"\",\n    \"email\": \"ruim\",\n    \"senha\": \"curta\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                  "pm.test('valida também o admin aninhado', () => pm.expect(pm.response.json().campos).to.include.keys('nome','uf','codigoIbge','admin.email','admin.senha'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar município",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioNovoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioNovoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('HAL com link self', () => pm.expect(pm.response.json()._links.self.href).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar município inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "999999"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar município",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioNovoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioNovoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nova Esperança\",\n  \"uf\": \"PR\",\n  \"ativo\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('nome atualizado', () => pm.expect(pm.response.json().nome).to.eql('Nova Esperança'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desativar município (PUT ativo=false)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios/{{municipioNovoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios",
+                "{{municipioNovoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nova Esperança\",\n  \"uf\": \"PR\",\n  \"ativo\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('inativo', () => pm.expect(pm.response.json().ativo).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login em município desativado (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminNovoEmail}}\",\n  \"senha\": \"senhaforte123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar municípios como ADMIN municipal (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar municípios sem token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/municipios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "municipios"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Secretarias",
+      "item": [
+        {
+          "name": "Listar secretarias (ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json()._embedded.secretarias;",
+                  "pm.test('só secretarias do próprio município', () => pm.expect(lista.map(s => s.sigla)).to.not.include('SEMAD'));",
+                  "pm.collectionVariables.set('secretariaSemobId', lista.find(s => s.sigla === 'SEMOB').id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar secretarias (OUVIDOR)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar secretarias do outro município (OUVIDOR de Campo Aurora)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidorOutro}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json()._embedded.secretarias;",
+                  "pm.test('não vê as de Vila Serena', () => pm.expect(lista.map(s => s.sigla)).to.not.include('SEMOB'));",
+                  "pm.collectionVariables.set('secretariaOutroId', lista[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar secretaria (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Secretaria de Teste\",\n  \"sigla\": \"t{{$timestamp}}\",\n  \"email\": \"teste@demo.gov.br\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('Location aponta para o recurso', () => pm.expect(pm.response.headers.get('Location')).to.eql(pm.response.json()._links.self.href));",
+                  "pm.test('HAL com link self', () => pm.expect(pm.response.json()._links.self.href).to.be.a('string'));",
+                  "pm.collectionVariables.set('secretariaNovaId', pm.response.json().id);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('sigla normalizada em maiúsculas', () => pm.expect(pm.response.json().sigla).to.match(/^T\\d+$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar secretaria com sigla já usada (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Obras de novo\",\n  \"sigla\": \"semob\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar secretaria com dados inválidos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"sigla\": \"\",\n  \"email\": \"ruim\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                  "pm.test('aponta os campos', () => pm.expect(pm.response.json().campos).to.have.all.keys('nome','sigla','email'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar secretaria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias/{{secretariaNovaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias",
+                "{{secretariaNovaId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('HAL com link self', () => pm.expect(pm.response.json()._links.self.href).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar secretaria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias/{{secretariaNovaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias",
+                "{{secretariaNovaId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Secretaria de Testes Renomeada\",\n  \"sigla\": \"TST{{$timestamp}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('nome atualizado', () => pm.expect(pm.response.json().nome).to.eql('Secretaria de Testes Renomeada'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desativar secretaria (204)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias/{{secretariaNovaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias",
+                "{{secretariaNovaId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Secretaria desativada continua consultável",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias/{{secretariaNovaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias",
+                "{{secretariaNovaId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('ativa = false', () => pm.expect(pm.response.json().ativa).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar secretaria de outro município (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias/{{secretariaOutroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias",
+                "{{secretariaOutroId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar secretaria inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias",
+                "999999"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar secretaria como OUVIDOR (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"X\",\n  \"sigla\": \"X\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar secretarias como ADMIN_PLATAFORMA (403, sem município)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/secretarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "secretarias"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPlataforma}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "Listar usuários do município",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json()._embedded.usuarios;",
+                  "pm.test('não expõe senha', () => lista.forEach(u => pm.expect(u).to.not.have.any.keys('senha','senhaHash')));",
+                  "pm.test('só usuários do próprio município', () => pm.expect(lista.map(u => u.email)).to.not.include('ouvidor@outra.gov.br'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuários filtrando por perfil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios?perfil=SERVIDOR",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "perfil",
+                  "value": "SERVIDOR"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('só SERVIDOR', () => pm.response.json()._embedded.usuarios.forEach(u => pm.expect(u.perfil).to.eql('SERVIDOR')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar SERVIDOR (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Servidor Novo\",\n  \"email\": \"servidor{{$timestamp}}@demo.gov.br\",\n  \"senha\": \"senhaforte123\",\n  \"perfil\": \"SERVIDOR\",\n  \"secretariaId\": \"{{secretariaSemobId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('Location aponta para o recurso', () => pm.expect(pm.response.headers.get('Location')).to.eql(pm.response.json()._links.self.href));",
+                  "pm.test('HAL com link self', () => pm.expect(pm.response.json()._links.self.href).to.be.a('string'));",
+                  "pm.collectionVariables.set('usuarioNovoId', pm.response.json().id);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('link para a secretaria', () => pm.expect(pm.response.json()._links.secretaria.href).to.include('/secretarias/'));",
+                  "pm.collectionVariables.set('usuarioNovoEmail', pm.response.json().email);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar SERVIDOR sem secretaria (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sem Secretaria\",\n  \"email\": \"sem{{$timestamp}}@demo.gov.br\",\n  \"senha\": \"senhaforte123\",\n  \"perfil\": \"SERVIDOR\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar SERVIDOR em secretaria de outro município (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Infiltrado\",\n  \"email\": \"infiltrado{{$timestamp}}@demo.gov.br\",\n  \"senha\": \"senhaforte123\",\n  \"perfil\": \"SERVIDOR\",\n  \"secretariaId\": \"{{secretariaOutroId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar usuário CIDADAO pelo ADMIN (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cidadão\",\n  \"email\": \"c{{$timestamp}}@demo.gov.br\",\n  \"senha\": \"senhaforte123\",\n  \"perfil\": \"CIDADAO\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar usuário sem senha (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sem Senha\",\n  \"email\": \"s{{$timestamp}}@demo.gov.br\",\n  \"perfil\": \"OUVIDOR\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar usuário com e-mail já usado (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Repetido\",\n  \"email\": \"Ouvidor@Demo.gov.br\",\n  \"senha\": \"senhaforte123\",\n  \"perfil\": \"OUVIDOR\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar usuário",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{usuarioNovoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{usuarioNovoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('HAL com link self', () => pm.expect(pm.response.json()._links.self.href).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar usuário para OUVIDOR (sai da secretaria)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{usuarioNovoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{usuarioNovoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Servidor Promovido\",\n  \"email\": \"{{usuarioNovoEmail}}\",\n  \"perfil\": \"OUVIDOR\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('perfil OUVIDOR sem secretaria', () => { const u = pm.response.json(); pm.expect(u.perfil).to.eql('OUVIDOR'); pm.expect(u.secretariaId).to.be.null; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desativar usuário (204)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{usuarioNovoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{usuarioNovoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de usuário desativado (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{usuarioNovoEmail}}\",\n  \"senha\": \"senhaforte123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ADMIN desativando a própria conta (409)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{idAdmin}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{idAdmin}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ADMIN tirando o próprio perfil ADMIN (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{idAdmin}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{idAdmin}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Admin Vila Serena\",\n  \"email\": \"admin@demo.gov.br\",\n  \"perfil\": \"OUVIDOR\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alterar conta de cidadão (403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{idCidadao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{idCidadao}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Mudando\",\n  \"email\": \"cidadao@demo.gov.br\",\n  \"perfil\": \"OUVIDOR\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar usuário de outro município (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{idOuvidorOutro}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{idOuvidorOutro}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuários como OUVIDOR (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tipos e prazos",
+      "item": [
+        {
+          "name": "Listar tipos com prazo vigente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const tipos = pm.response.json()._embedded.tipos;",
+                  "pm.test('5 tipos', () => pm.expect(tipos).to.have.lengthOf(5));",
+                  "const lai = tipos.find(t => t.codigo === 'PEDIDO_INFORMACAO');",
+                  "pm.test('LAI federal: 20 + 10, recurso 10/5', () => pm.expect(lai.prazo).to.include({origem: 'FEDERAL', diasResposta: 20, diasProrrogacao: 10, diasInterposicaoRecurso: 10, diasJulgamentoRecurso: 5}));",
+                  "pm.collectionVariables.set('tipoReclamacaoId', tipos.find(t => t.codigo === 'RECLAMACAO').id);",
+                  "pm.collectionVariables.set('tipoLaiId', lai.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar tipos como CIDADAO",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCidadao}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir prazo municipal de reclamação (15 + 15)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 15,\n  \"permiteProrrogacao\": true,\n  \"diasProrrogacao\": 15\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('prazo agora é MUNICIPAL', () => pm.expect(pm.response.json().prazo).to.include({origem: 'MUNICIPAL', diasResposta: 15}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Outro município continua com o prazo federal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidorOutro}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('isolamento: FEDERAL, 30 dias', () => pm.expect(pm.response.json().prazo).to.include({origem: 'FEDERAL', diasResposta: 30}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir prazo LAI mais protetivo (15 + 5, recurso 15/3)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoLaiId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoLaiId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 15,\n  \"permiteProrrogacao\": true,\n  \"diasProrrogacao\": 5,\n  \"diasInterposicaoRecurso\": 15,\n  \"diasJulgamentoRecurso\": 3\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prazo de resposta maior que o federal (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 45,\n  \"permiteProrrogacao\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prazo para o cidadão recorrer menor que o federal (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoLaiId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoLaiId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 20,\n  \"permiteProrrogacao\": false,\n  \"diasInterposicaoRecurso\": 5,\n  \"diasJulgamentoRecurso\": 5\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "LAI sem prazos de recurso (400, recurso é direito)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoLaiId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoLaiId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 20,\n  \"permiteProrrogacao\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prazo de recurso em tipo de ouvidoria (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 20,\n  \"permiteProrrogacao\": false,\n  \"diasInterposicaoRecurso\": 10,\n  \"diasJulgamentoRecurso\": 5\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prorrogação sem dias (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 20,\n  \"permiteProrrogacao\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dados inválidos (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(400));",
+                  "pm.test('aponta os campos', () => pm.expect(pm.response.json().campos).to.have.all.keys('diasResposta','permiteProrrogacao'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Definir prazo como OUVIDOR (403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 10,\n  \"permiteProrrogacao\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tipo inexistente (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/999999/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "999999",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diasResposta\": 10,\n  \"permiteProrrogacao\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('corpo é ProblemDetail', () => pm.expect(pm.response.json().status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remover prazo municipal de reclamação (204)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remover prazo municipal da LAI (204)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoLaiId}}/prazo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoLaiId}}",
+                "prazo"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reclamação voltou ao prazo federal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tipos-manifestacao/{{tipoReclamacaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tipos-manifestacao",
+                "{{tipoReclamacaoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOuvidor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('FEDERAL de novo', () => pm.expect(pm.response.json().prazo.origem).to.eql('FEDERAL'));"
                 ]
               }
             }
