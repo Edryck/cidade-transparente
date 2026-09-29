@@ -24,6 +24,10 @@ public class Municipio {
     private String codigoIbge;
     private boolean ativo = true;
 
+    /** Encarregado de dados (LGPD art. 41), indicado pela prefeitura e divulgado no aviso de privacidade. */
+    private String encarregadoNome;
+    private String encarregadoEmail;
+
     @CreationTimestamp
     @Column(updatable = false)
     private OffsetDateTime criadoEm;

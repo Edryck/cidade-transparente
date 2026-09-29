@@ -7,6 +7,17 @@ INSERT INTO municipio (nome, uf, codigo_ibge) VALUES
     ('Campo Aurora',  'PR', '9999902')
 ON CONFLICT (codigo_ibge) DO NOTHING;
 
+-- Encarregado de dados de cada prefeitura (LGPD art. 41). Só preenche se ainda estiver vazio,
+-- para não sobrescrever o que o ADMIN tiver alterado pela API.
+UPDATE municipio m
+   SET encarregado_nome = e.nome, encarregado_email = e.email
+  FROM (VALUES
+        ('9999901', 'Encarregada de Dados de Vila Serena',  'lgpd@demo.gov.br'),
+        ('9999902', 'Encarregado de Dados de Campo Aurora', 'lgpd@outra.gov.br')
+       ) AS e (ibge, nome, email)
+ WHERE m.codigo_ibge = e.ibge
+   AND m.encarregado_nome IS NULL;
+
 INSERT INTO secretaria (municipio_id, nome, sigla, email)
 SELECT m.id, s.nome, s.sigla, s.email
   FROM (VALUES

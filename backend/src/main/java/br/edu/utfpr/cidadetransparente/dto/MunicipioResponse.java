@@ -7,9 +7,10 @@ import java.time.OffsetDateTime;
 
 @Relation(collectionRelation = "municipios", itemRelation = "municipio")
 public record MunicipioResponse(Long id, String nome, String uf, String codigoIbge, boolean ativo,
-                                OffsetDateTime criadoEm) {
+                                String encarregadoNome, String encarregadoEmail, OffsetDateTime criadoEm) {
 
     public static MunicipioResponse de(Municipio m) {
-        return new MunicipioResponse(m.getId(), m.getNome(), m.getUf(), m.getCodigoIbge(), m.isAtivo(), m.getCriadoEm());
+        return new MunicipioResponse(m.getId(), m.getNome(), m.getUf(), m.getCodigoIbge(), m.isAtivo(),
+                m.getEncarregadoNome(), m.getEncarregadoEmail(), m.getCriadoEm());
     }
 }

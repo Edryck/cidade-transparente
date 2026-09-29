@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,8 @@ public class MunicipioService {
         municipio.setNome(request.nome().trim());
         municipio.setUf(request.uf());
         municipio.setCodigoIbge(request.codigoIbge());
+        municipio.setEncarregadoNome(request.encarregado().nome().trim());
+        municipio.setEncarregadoEmail(request.encarregado().email().trim().toLowerCase(Locale.ROOT));
         municipioRepository.save(municipio);
 
         var admin = request.admin();
