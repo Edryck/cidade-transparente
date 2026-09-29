@@ -49,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/protocolos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/municipios/ativos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/municipios/*/privacidade").permitAll()
+                        // Relatório de gestão publicado é público por lei (Lei 13.460, art. 15, parágrafo único, II)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/municipios/*/relatorios-gestao", "/api/v1/municipios/*/relatorios-gestao/*").permitAll()
                         // Pública para a denúncia anônima; com token, o service exige perfil CIDADAO
                         .requestMatchers(HttpMethod.POST, "/api/v1/manifestacoes").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
