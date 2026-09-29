@@ -25,7 +25,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    /** O ADMIN só gerencia a equipe da prefeitura; conta de cidadão é criada e mantida pelo próprio cidadão. */
+    /**
+     * O ADMIN só enxerga e gerencia a equipe da prefeitura. Conta de cidadão é criada e mantida pelo próprio
+     * cidadão, e o ADMIN não precisa dos dados dela para exercer sua função (LGPD art. 6º, III, necessidade).
+     */
     private static final Set<String> PERFIS_DA_EQUIPE = Set.of(Perfil.ADMIN, Perfil.OUVIDOR, Perfil.SERVIDOR);
 
     private final UsuarioRepository usuarioRepository;
@@ -57,16 +60,15 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<UsuarioResponse> listar(String perfil) {
-        Long municipioId = UsuarioAutenticado.atual().municipioId();
-        List<Usuario> usuarios = perfil == null
-                ? usuarioRepository.findByMunicipioIdOrderByNomeAsc(municipioId)
-                : usuarioRepository.findByMunicipioIdAndPerfilNomeOrderByNomeAsc(municipioId, perfil.toUpperCase(Locale.ROOT));
-        return usuarios.stream().map(UsuarioResponse::de).toList();
+        Set<String> perfis = perfil == null ? PERFIS_DA_EQUIPE : Set.of(validarPerfilDaEquipe(perfil));
+        return usuarioRepository
+                .findByMunicipioIdAndPerfilNomeInOrderByNomeAsc(UsuarioAutenticado.atual().municipioId(), perfis)
+                .stream().map(UsuarioResponse::de).toList();
     }
 
     @Transactional(readOnly = true)
     public UsuarioResponse buscar(Long id) {
-        return UsuarioResponse.de(buscarNoMunicipio(id));
+        return UsuarioResponse.de(buscarDaEquipe(id));
     }
 
     @Transactional
@@ -124,18 +126,14 @@ public class UsuarioService {
         usuario.setAtivo(false);
     }
 
-    private Usuario buscarNoMunicipio(Long id) {
-        // Usuário de outro município responde 404, igual a inexistente: não confirma que o id existe
-        return usuarioRepository.findByIdAndMunicipioId(id, UsuarioAutenticado.atual().municipioId())
-                .orElseThrow(() -> ApiException.naoEncontrado("Usuário não encontrado"));
-    }
-
+    /**
+     * Usuário de outro município e conta de cidadão respondem 404, igual a inexistente: a resposta não confirma
+     * que o id existe nem que pertence a um cidadão.
+     */
     private Usuario buscarDaEquipe(Long id) {
-        Usuario usuario = buscarNoMunicipio(id);
-        if (!PERFIS_DA_EQUIPE.contains(usuario.getPerfil().getNome())) {
-            throw ApiException.proibido("Conta de cidadão só pode ser alterada pelo próprio cidadão");
-        }
-        return usuario;
+        return usuarioRepository
+                .findByIdAndMunicipioIdAndPerfilNomeIn(id, UsuarioAutenticado.atual().municipioId(), PERFIS_DA_EQUIPE)
+                .orElseThrow(() -> ApiException.naoEncontrado("Usuário não encontrado"));
     }
 
     private String validarPerfilDaEquipe(String perfil) {

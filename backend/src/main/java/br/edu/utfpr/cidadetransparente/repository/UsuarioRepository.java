@@ -4,6 +4,7 @@ import br.edu.utfpr.cidadetransparente.domain.Usuario;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +18,14 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
 
+    /** Equipe da prefeitura: o filtro por perfil impede que o ADMIN enxergue contas de cidadãos (LGPD art. 6º, III). */
     @EntityGraph(attributePaths = {"perfil", "secretaria"})
-    List<Usuario> findByMunicipioIdOrderByNomeAsc(Long municipioId);
+    List<Usuario> findByMunicipioIdAndPerfilNomeInOrderByNomeAsc(Long municipioId, Collection<String> perfis);
 
     @EntityGraph(attributePaths = {"perfil", "secretaria"})
-    List<Usuario> findByMunicipioIdAndPerfilNomeOrderByNomeAsc(Long municipioId, String perfil);
+    Optional<Usuario> findByIdAndMunicipioIdAndPerfilNomeIn(Long id, Long municipioId, Collection<String> perfis);
 
-    @EntityGraph(attributePaths = {"perfil", "secretaria"})
-    Optional<Usuario> findByIdAndMunicipioId(Long id, Long municipioId);
+    /** Conta do próprio usuário logado (direitos do titular). */
+    @EntityGraph(attributePaths = {"perfil", "municipio"})
+    Optional<Usuario> findWithPerfilAndMunicipioById(Long id);
 }
