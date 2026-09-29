@@ -48,7 +48,10 @@ export default function Login() {
         const daConta = lista.find((m) => m.id === sessao.municipioId)
         if (daConta) escolher(daConta)
       }
-      navegar(ROTA_INICIAL[sessao.perfil], { replace: true })
+      // Volta para a página protegida que pediu o login, se for um caminho interno
+      const voltar = parametros.get('voltar')
+      const destino = voltar && voltar.startsWith('/') && !voltar.startsWith('//') ? voltar : ROTA_INICIAL[sessao.perfil]
+      navegar(destino, { replace: true })
     } catch (erro) {
       const f = erro instanceof FalhaApi ? erro : new FalhaApi(500, 'Não foi possível entrar agora.')
       setErros(f.campos)

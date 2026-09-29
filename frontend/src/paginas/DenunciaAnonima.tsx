@@ -7,6 +7,7 @@ import { Botao } from '../componentes/Botao'
 import { CampoFormulario } from '../componentes/CampoFormulario'
 import { comprovanteTemporario } from '../contextos/comprovante'
 import { useMunicipio } from '../contextos/MunicipioContext'
+import { useEnvioUnico } from '../util/useEnvioUnico'
 import { useTitulo } from '../util/useTitulo'
 
 /**
@@ -32,7 +33,7 @@ export default function DenunciaAnonima() {
   const [campos, setCampos] = useState(lerRascunho)
   const [erros, setErros] = useState<Record<string, string>>({})
   const [falha, setFalha] = useState('')
-  const [enviando, setEnviando] = useState(false)
+  const { enviando, executar } = useEnvioUnico()
   const refFalha = useRef<HTMLDivElement>(null)
 
   // Rascunho salvo a cada alteração, só nesta aba (sessionStorage): recarregar a página não perde o texto
@@ -44,8 +45,9 @@ export default function DenunciaAnonima() {
     }
   }, [campos])
 
-  async function enviar(evento: FormEvent) {
+  function enviar(evento: FormEvent) {
     evento.preventDefault()
+    executar(async () => {
     const novos: Record<string, string> = {}
     if (!campos.assunto.trim()) novos.assunto = 'Escreva em poucas palavras sobre o que é a denúncia'
     if (!campos.descricao.trim()) novos.descricao = 'Descreva o que aconteceu'
@@ -53,7 +55,6 @@ export default function DenunciaAnonima() {
     setFalha('')
     if (Object.keys(novos).length || !municipio) return
 
-    setEnviando(true)
     try {
       const criada = await manifestacoesApi.criarAnonima({
         municipioId: municipio.id,
@@ -77,9 +78,8 @@ export default function DenunciaAnonima() {
       setErros(f.campos)
       setFalha(Object.keys(f.campos).length ? 'Confira os campos marcados.' : f.message)
       requestAnimationFrame(() => refFalha.current?.focus())
-    } finally {
-      setEnviando(false)
     }
+    })
   }
 
   return (

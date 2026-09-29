@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Alerta } from '../componentes/Alerta'
 import { Comprovante } from '../componentes/Comprovante'
 import { EstadoVazio } from '../componentes/Estados'
 import { comprovanteTemporario } from '../contextos/comprovante'
@@ -30,19 +31,27 @@ export default function ConfirmacaoRegistro() {
     )
   }
 
+  const cidadao = sessao?.perfil === 'CIDADAO'
+  const falhas = comprovante.anexos?.filter((a) => !a.enviado) ?? []
   const url = `${window.location.origin}/acompanhar?protocolo=${encodeURIComponent(comprovante.protocolo)}`
   return (
     <>
       <h1>Manifestação registrada</h1>
-      <p>Sua manifestação foi registrada. Guarde este protocolo e a chave de acesso.</p>
+      <p>Sua manifestação foi registrada. Guarde este protocolo e a chave de acesso{cidadao ? ': mesmo com a conta, eles são o seu comprovante' : ''}.</p>
+      {comprovante.anexos && comprovante.anexos.length > 0 && (falhas.length === 0
+        ? <Alerta tipo="sucesso"><p>{comprovante.anexos.length === 1 ? 'Anexo enviado' : `${comprovante.anexos.length} anexos enviados`}: {comprovante.anexos.map((a) => a.nome).join(', ')}.</p></Alerta>
+        : <Alerta tipo="atencao" titulo="Alguns anexos não foram enviados">
+            <ul>{falhas.map((a) => <li key={a.nome}>{a.nome}: {a.motivo}</li>)}</ul>
+            <p>A manifestação foi registrada. Envie esses arquivos de novo pelo detalhe da manifestação.</p>
+          </Alerta>)}
       <Comprovante
         comprovante={comprovante}
         brasao={municipio?.brasao}
         urlAcompanhamento={url}
-        linkDetalhe={sessao && !comprovante.anonima ? `/manifestacoes/${comprovante.id}` : undefined}
+        linkDetalhe={cidadao && !comprovante.anonima ? `/minhas-manifestacoes/${comprovante.id}` : undefined}
         onConcluir={() => {
           comprovanteTemporario.descartar()
-          navegar('/', { replace: true })
+          navegar(cidadao ? '/minhas-manifestacoes' : '/', { replace: true })
         }}
       />
     </>

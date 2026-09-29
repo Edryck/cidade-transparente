@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Carregando } from './componentes/Estados'
-import { LayoutPublico, RequerMunicipio } from './componentes/Layout'
+import { LayoutPublico, RequerMunicipio, RequerSessao } from './componentes/Layout'
 import { MunicipioProvider } from './contextos/MunicipioContext'
 import AcompanharProtocolo from './paginas/AcompanharProtocolo'
 import AreaPendente from './paginas/AreaPendente'
@@ -17,6 +17,11 @@ import NaoEncontrada from './paginas/NaoEncontrada'
 const AvisoPrivacidade = lazy(() => import('./paginas/AvisoPrivacidade'))
 const RelatoriosGestao = lazy(() => import('./paginas/RelatoriosGestao'))
 const RelatorioAno = lazy(() => import('./paginas/RelatorioAno'))
+// Área do cidadão: só baixa depois do login
+const MinhasManifestacoes = lazy(() => import('./paginas/cidadao/MinhasManifestacoes'))
+const NovaManifestacao = lazy(() => import('./paginas/cidadao/NovaManifestacao'))
+const DetalheManifestacao = lazy(() => import('./paginas/cidadao/DetalheManifestacao'))
+const MinhaConta = lazy(() => import('./paginas/cidadao/MinhaConta'))
 
 export default function App() {
   return (
@@ -37,8 +42,16 @@ export default function App() {
                 <Route path="/relatorios" element={<RelatoriosGestao />} />
                 <Route path="/relatorios/:ano" element={<RelatorioAno />} />
               </Route>
-              {/* Áreas autenticadas (telas 9 em diante): rotas reservadas, ainda sem telas */}
-              {['/minhas-manifestacoes', '/painel', '/secretaria', '/administracao', '/plataforma', '/minha-conta', '/manifestacoes/:id'].map((caminho) => (
+              <Route element={<RequerSessao perfis={['CIDADAO']} />}>
+                <Route element={<RequerMunicipio />}>
+                  <Route path="/minhas-manifestacoes" element={<MinhasManifestacoes />} />
+                  <Route path="/minhas-manifestacoes/:id" element={<DetalheManifestacao />} />
+                  <Route path="/nova-manifestacao" element={<NovaManifestacao />} />
+                  <Route path="/minha-conta" element={<MinhaConta />} />
+                </Route>
+              </Route>
+              {/* Painéis da equipe (telas 14 em diante): rotas reservadas, ainda sem telas */}
+              {['/painel', '/secretaria', '/administracao', '/plataforma', '/area-indisponivel'].map((caminho) => (
                 <Route key={caminho} path={caminho} element={<AreaPendente />} />
               ))}
               <Route path="*" element={<NaoEncontrada />} />
