@@ -76,6 +76,7 @@ Criados pela migration repeatable `db/dev/R__seed_dados_demo.sql`, carregada só
 | OUVIDOR | ouvidor@demo.gov.br | ouvidor123 |
 | SERVIDOR | servidor@demo.gov.br | servidor123 |
 | CIDADAO | cidadao@demo.gov.br | cidadao123 |
+| ADMIN (outro município) | admin@outra.gov.br | admin123 |
 | OUVIDOR (outro município) | ouvidor@outra.gov.br | ouvidor123 |
 
 O seed cria dois municípios fictícios (Vila Serena e Campo Aurora) para demonstrar o isolamento: o ouvidor de um não enxerga as manifestações do outro.

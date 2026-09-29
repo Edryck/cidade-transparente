@@ -27,6 +27,7 @@ SELECT u.nome, u.email, u.senha_hash, p.id, m.id, s.id
         ('Ouvidora Vila Serena',        'ouvidor@demo.gov.br',    '$2a$10$GfPd2bh6GeAJ0iRqVqDgseGSPmjNqXwDBwQpEgrptWK6XZgLwYimu', 'OUVIDOR',          '9999901', NULL),
         ('Servidor de Obras',           'servidor@demo.gov.br',   '$2a$10$.HBtConCsmVVjzuJAuUe4eiRgVuJiJiL0sVrXJrGxlPqbEaYiBglu', 'SERVIDOR',         '9999901', 'SEMOB'),
         ('Maria Cidadã',                'cidadao@demo.gov.br',    '$2a$10$iNuWJQpMOSTTkcFuvobFluS9FgAE9FwQMy4Zzm17di7oOlT5HBPw2', 'CIDADAO',          '9999901', NULL),
+        ('Admin Campo Aurora',          'admin@outra.gov.br',     '$2a$10$TbC2Iv8/7luJGlvz0H3Hause3Rn6PUQDnR/2LwXgZS0dcvKM7.1yS', 'ADMIN',            '9999902', NULL),
         ('Ouvidor Campo Aurora',        'ouvidor@outra.gov.br',   '$2a$10$GfPd2bh6GeAJ0iRqVqDgseGSPmjNqXwDBwQpEgrptWK6XZgLwYimu', 'OUVIDOR',          '9999902', NULL)
        ) AS u (nome, email, senha_hash, perfil, ibge, sigla)
   JOIN perfil p ON p.nome = u.perfil
