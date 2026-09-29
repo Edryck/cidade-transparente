@@ -1,5 +1,6 @@
 package br.edu.utfpr.cidadetransparente.controller;
 
+import br.edu.utfpr.cidadetransparente.dto.AlteracaoSenhaRequest;
 import br.edu.utfpr.cidadetransparente.dto.AvisoPrivacidadeResponse;
 import br.edu.utfpr.cidadetransparente.dto.EncarregadoRequest;
 import br.edu.utfpr.cidadetransparente.dto.EncerramentoContaResponse;
@@ -51,6 +52,13 @@ public class PrivacidadeController {
     @PutMapping("/minha-conta")
     public EntityModel<MinhaContaResponse> corrigirMinhaConta(@Valid @RequestBody MinhaContaRequest request) {
         return comLinks(privacidadeService.corrigirMinhaConta(request));
+    }
+
+    /** Qualquer perfil troca a própria senha; 204 sem corpo, porque não há recurso a devolver. */
+    @PutMapping("/minha-conta/senha")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void alterarSenha(@Valid @RequestBody AlteracaoSenhaRequest request) {
+        privacidadeService.alterarSenha(request);
     }
 
     /** 200 com corpo, e não 204: a lei exige explicar por que os dados não são eliminados (art. 18, § 4º, II). */

@@ -1,10 +1,12 @@
 package br.edu.utfpr.cidadetransparente.service;
 
 import br.edu.utfpr.cidadetransparente.config.UsuarioAutenticado;
+import br.edu.utfpr.cidadetransparente.domain.AcaoAuditoria;
 import br.edu.utfpr.cidadetransparente.domain.Cidadao;
 import br.edu.utfpr.cidadetransparente.domain.Municipio;
 import br.edu.utfpr.cidadetransparente.domain.Perfil;
 import br.edu.utfpr.cidadetransparente.domain.Usuario;
+import br.edu.utfpr.cidadetransparente.dto.AlteracaoSenhaRequest;
 import br.edu.utfpr.cidadetransparente.dto.AvisoPrivacidadeResponse;
 import br.edu.utfpr.cidadetransparente.dto.AvisoPrivacidadeResponse.Direito;
 import br.edu.utfpr.cidadetransparente.dto.AvisoPrivacidadeResponse.Encarregado;
@@ -18,6 +20,7 @@ import br.edu.utfpr.cidadetransparente.repository.CidadaoRepository;
 import br.edu.utfpr.cidadetransparente.repository.MunicipioRepository;
 import br.edu.utfpr.cidadetransparente.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +92,8 @@ public class PrivacidadeService {
     private final MunicipioRepository municipioRepository;
     private final UsuarioRepository usuarioRepository;
     private final CidadaoRepository cidadaoRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuditoriaService auditoria;
 
     @Transactional(readOnly = true)
     public AvisoPrivacidadeResponse aviso(Long municipioId) {
@@ -167,6 +172,25 @@ public class PrivacidadeService {
                         "A LGPD autoriza conservar os dados para cumprimento de obrigação legal (art. 16, I).",
                         "A identificação de quem se manifesta tem acesso restrito por até 100 anos "
                                 + "(Lei 12.527/2011, art. 31, § 1º, I; Lei 13.460/2017, art. 10, § 7º)."));
+    }
+
+    /**
+     * Troca de senha do próprio usuário, qualquer perfil. Exige a senha atual e registra a troca na auditoria
+     * (LGPD arts. 37 e 46). Tokens já emitidos continuam válidos até expirar (no máximo 2h): o JWT não tem estado.
+     */
+    @Transactional
+    public void alterarSenha(AlteracaoSenhaRequest request) {
+        Usuario usuario = usuarioLogado();
+        if (!passwordEncoder.matches(request.senhaAtual(), usuario.getSenhaHash())) {
+            throw ApiException.requisicaoInvalida("Senha atual incorreta");
+        }
+        if (passwordEncoder.matches(request.novaSenha(), usuario.getSenhaHash())) {
+            throw ApiException.requisicaoInvalida("A nova senha precisa ser diferente da atual");
+        }
+        usuario.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
+        auditoria.registrar(AcaoAuditoria.SENHA_ALTERADA,
+                usuario.getMunicipio() == null ? null : usuario.getMunicipio().getId(),
+                usuario.getId(), "Usuario", usuario.getId(), null);
     }
 
     private Usuario usuarioLogado() {
