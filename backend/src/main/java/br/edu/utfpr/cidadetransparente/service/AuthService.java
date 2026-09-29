@@ -1,6 +1,7 @@
 package br.edu.utfpr.cidadetransparente.service;
 
 import br.edu.utfpr.cidadetransparente.config.JwtService;
+import br.edu.utfpr.cidadetransparente.domain.AcaoAuditoria;
 import br.edu.utfpr.cidadetransparente.domain.Cidadao;
 import br.edu.utfpr.cidadetransparente.domain.Municipio;
 import br.edu.utfpr.cidadetransparente.domain.Perfil;
@@ -28,8 +29,10 @@ public class AuthService {
     private final CidadaoRepository cidadaoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuditoriaService auditoria;
 
-    @Transactional(readOnly = true)
+    /** Não é readOnly: o login bem-sucedido entra no registro de acesso (Marco Civil, art. 15). */
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         // Mesma mensagem para e-mail inexistente e senha errada: não revela quais e-mails têm conta
         Usuario usuario = usuarioRepository.findByEmailIgnoreCase(request.email().trim())
@@ -40,6 +43,8 @@ public class AuthService {
         if (!usuario.isAtivo() || municipioInativo) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Usuário ou município desativado");
         }
+        auditoria.registrar(AcaoAuditoria.LOGIN, usuario.getMunicipio() == null ? null : usuario.getMunicipio().getId(),
+                usuario.getId(), "Usuario", usuario.getId(), null);
         return gerarResposta(usuario);
     }
 
