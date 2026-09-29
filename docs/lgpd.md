@@ -106,6 +106,7 @@ A denúncia anônima é válida para iniciar uma apuração preliminar, mas sozi
 | Mensagem de login idêntica para e-mail inexistente e senha errada | ✅ |
 | Erros padronizados (ProblemDetail) sem dado pessoal nem stack trace | ✅ |
 | Rota pública nunca expõe dado pessoal | ✅ |
+| Relatório de gestão público só com contagens agregadas; dos solicitantes LAI, apenas o número de pessoas distintas (LAI art. 30, III, sem perfil: art. 6º, III) | ✅ |
 | Consulta por protocolo exige chave de acesso aleatória (12 caracteres, cerca de 2^59 combinações), guardada só como hash SHA-256 e enviada no header, não na URL. Protocolo inexistente e chave errada dão o mesmo 404 | ✅ |
 | Trilha de quem acessou a identidade do manifestante | ✅ |
 | Anexos: só PDF, PNG e JPEG, identificados pelos bytes do arquivo (não pela extensão), até 5 MB, entregues sempre como download (`Content-Disposition: attachment`) | ✅ |

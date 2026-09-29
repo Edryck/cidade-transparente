@@ -58,6 +58,7 @@ Meta do exame é 10 ou mais. Ficam 12 no núcleo e 2 de reserva que podem cair s
 | 13 | `Notificacao` (reserva) | Aviso de prazo próximo do vencimento |
 | 14 | `Auditoria` | Registro de acesso (IP por 6 meses, Marco Civil art. 15) e trilha de quem fez o quê (LGPD art. 37). Deixou de ser reserva: tem base legal própria, ver `lgpd.md` |
 | 15 | `Feriado` | Calendário de dias sem expediente para a contagem de prazo (Lei 9.784, art. 66, § 1º). Nacionais por migration (Lei 662/1949, Lei 6.802/1980, Lei 14.759/2023); estaduais, municipais e pontos facultativos cadastrados pela prefeitura (Lei 9.093/1995) |
+| 16 | `RelatorioGestao` | Relatório anual da ouvidoria (Lei 13.460, arts. 14, II, e 15; LAI art. 30, III): análise e providências escritas pela ouvidoria, números calculados pelo sistema e congelados na publicação |
 
 **Relacionamentos principais:** Município 1:N Usuário, Secretaria e Manifestação. Manifestação N:1 Cidadão, TipoManifestação e Secretaria. Manifestação 1:N Anexo, Trâmite e Resposta. Resposta 1:1 Recurso (instância única). Usuário SERVIDOR N:1 Secretaria. TipoManifestação 1:N PrazoLegal: uma regra federal (`municipio_id` nulo) e, opcionalmente, uma por município que a sobrescreve (art. 45 da LAI permite regulamentação local).
 
@@ -139,7 +140,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Recursos | `POST /respostas/{id}/recursos`, `GET/PUT /recursos/{id}` (PUT = julgar) |
 | Feriados | `GET /feriados?ano=` (calendário do município), `GET /feriados/{id}`, `POST /feriados` e `DELETE /feriados/{id}` (ADMIN, só municipais; nacionais só mudam por migration) |
 | Público | `GET /protocolos/{numero}` (exige a chave de acesso entregue na abertura: protocolo sequencial não é credencial), `GET /municipios/ativos`, `GET /municipios/{id}/privacidade` |
-| Relatórios | `GET /relatorios/gestao?ano=` (total por tipo, por secretaria, % no prazo) |
+| Relatórios | `GET/PUT /relatorios/gestao/{ano}` (prévia e rascunho; OUVIDOR escreve, ADMIN lê), `POST /relatorios/gestao/{ano}/publicacao` (só ano encerrado, com análise e providências), `GET /municipios/{id}/relatorios-gestao[/{ano}]` (público, só publicados, sem dado pessoal) |
 
 **Detalhe de projeto:** as ações são substantivos (`/prorrogacao`), não verbos (`/prorrogar`). Isso é o tipo de coisa que dá pra defender no vídeo de Richardson.
 
