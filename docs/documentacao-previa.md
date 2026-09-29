@@ -57,6 +57,7 @@ Meta do exame é 10 ou mais. Ficam 12 no núcleo e 2 de reserva que podem cair s
 | 12 | `PrazoLegal` | Regra de prazo por tipo: dias base, prorrogação permitida, dias de prorrogação |
 | 13 | `Notificacao` (reserva) | Aviso de prazo próximo do vencimento |
 | 14 | `Auditoria` | Registro de acesso (IP por 6 meses, Marco Civil art. 15) e trilha de quem fez o quê (LGPD art. 37). Deixou de ser reserva: tem base legal própria, ver `lgpd.md` |
+| 15 | `Feriado` | Calendário de dias sem expediente para a contagem de prazo (Lei 9.784, art. 66, § 1º). Nacionais por migration (Lei 662/1949, Lei 6.802/1980, Lei 14.759/2023); estaduais, municipais e pontos facultativos cadastrados pela prefeitura (Lei 9.093/1995) |
 
 **Relacionamentos principais:** Município 1:N Usuário, Secretaria e Manifestação. Manifestação N:1 Cidadão, TipoManifestação e Secretaria. Manifestação 1:N Anexo, Trâmite e Resposta. Resposta 1:1 Recurso (instância única). Usuário SERVIDOR N:1 Secretaria. TipoManifestação 1:N PrazoLegal: uma regra federal (`municipio_id` nulo) e, opcionalmente, uma por município que a sobrescreve (art. 45 da LAI permite regulamentação local).
 
@@ -83,7 +84,7 @@ As regras ficam em um lugar só (`FluxoManifestacao`): a mesma função valida a
 
 **Prorrogação não é status**: é a flag `prorrogada` na manifestação (permitida em RECEBIDA, EM_ANALISE e ENCAMINHADA, antes do vencimento). Como status, ela apagaria a etapa em que a manifestação estava. Gera trâmite visível ao requerente, que precisa ser cientificado (LAI art. 11, § 2º).
 
-**Contagem de prazo** (Lei 9.784, art. 66): exclui o dia do começo, inclui o do vencimento, dias corridos; vencimento em sábado ou domingo passa ao primeiro dia útil. **Limitação conhecida:** feriados ainda não são considerados; a correção é um calendário de feriados em dado.
+**Contagem de prazo** (Lei 9.784, art. 66): exclui o dia do começo, inclui o do vencimento, dias corridos; vencimento em dia sem expediente (fim de semana, feriado nacional ou feriado/ponto facultativo cadastrado pela prefeitura) passa ao primeiro dia útil. Vale para o prazo da administração e para o de recurso do cidadão.
 
 **Prazos (da pesquisa de mercado):**
 - Ouvidoria (Lei 13.460/2017): 30 dias, prorrogável uma vez por mais 30
@@ -136,6 +137,7 @@ Base: `/api/v1`. Tudo em plural, verbos HTTP corretos, status codes corretos (20
 | Trâmites | `GET /manifestacoes/{id}/tramites` |
 | Respostas | `POST/GET /manifestacoes/{id}/respostas`, `GET /manifestacoes/{id}/respostas/{respostaId}` |
 | Recursos | `POST /respostas/{id}/recursos`, `GET/PUT /recursos/{id}` (PUT = julgar) |
+| Feriados | `GET /feriados?ano=` (calendário do município), `GET /feriados/{id}`, `POST /feriados` e `DELETE /feriados/{id}` (ADMIN, só municipais; nacionais só mudam por migration) |
 | Público | `GET /protocolos/{numero}` (exige a chave de acesso entregue na abertura: protocolo sequencial não é credencial), `GET /municipios/ativos`, `GET /municipios/{id}/privacidade` |
 | Relatórios | `GET /relatorios/gestao?ano=` (total por tipo, por secretaria, % no prazo) |
 
