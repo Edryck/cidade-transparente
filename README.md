@@ -49,6 +49,10 @@ npm install
 npm run dev
 ```
 
+O frontend abre em `http://localhost:5173` e repassa `/api` para o backend em `localhost:8080` (proxy do Vite, sem CORS). Para outro endereço de backend, defina `API_URL` ao rodar `npm run dev`. Em produção, `npm run build` gera `frontend/dist`, e `VITE_API_URL` indica onde está a API.
+
+`VITE_TIPO_DENUNCIA_ID` (padrão `2`, o id do tipo DENUNCIA no seed) informa à tela de denúncia anônima qual tipo enviar: a lista de tipos da API exige login, então a tela pública ainda não consegue buscá-la.
+
 ### 4. Testes dos endpoints
 
 Importe a coleção `postman/CidadeTransparente.postman_collection.json` no Postman ou Insomnia e rode-a **inteira, na ordem**: as primeiras pastas fazem login com cada perfil e guardam em variáveis os tokens e ids que as seguintes usam. Os testes de anexo enviam os arquivos de `postman/arquivos/` (no Postman, confira o diretório de trabalho nas configurações).
